@@ -61,7 +61,6 @@
         <div id="admin-panel" class="bg-gray-800 p-4 sm:p-8 rounded-xl shadow-2xl">
             <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
                 <h2 class="text-3xl font-bold text-amber-400">لوحة تحكم الأدمن</h2>
-                <button id="logout-btn" class="hidden bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>
             </div>
             <div id="admin-content"></div>
         </div>
@@ -129,20 +128,17 @@
         // --- AUTHENTICATION & UI State ---
         auth.onAuthStateChanged(user => {
             if (user) {
-                // Admin is signed in
-                ui.authContainer.innerHTML = '';
-                document.getElementById('logout-btn').classList.remove('hidden');
+                ui.authContainer.innerHTML = `<button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>`;
+                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
                 document.body.classList.add('admin-mode');
                 switchView('admin-panel');
                 loadAdminPanel();
             } else {
-                // Admin is signed out
                 ui.authContainer.innerHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
-                document.getElementById('logout-btn').classList.add('hidden');
                 document.body.classList.remove('admin-mode');
                 switchView('store-view');
-                updateContactLinks();
+                updateUiWithSettings();
             }
         });
 
@@ -175,7 +171,7 @@
             document.body.addEventListener('click', handlePurchaseClick);
             document.getElementById('cancel-purchase-btn').addEventListener('click', () => ui.modals.purchase.classList.add('hidden'));
             ui.adminPanel.addEventListener('click', handleAdminPanelClick);
-            document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+            document.body.addEventListener('input', e => { if(e.target.id === 'search-bar') renderServices(); });
         }
 
         // --- All Handler Functions ---
@@ -186,10 +182,10 @@
         function handleAdminPanelClick(e) { const btn = e.target; const id = btn.dataset.id; if(btn.id === 'add-new-service-form-btn') renderServiceForm(); else if (btn.classList.contains('edit-service-btn')) renderServiceForm(allServices.find(s => s.id === id)); else if (btn.classList.contains('delete-service-btn')) { if(confirm('هل أنت متأكد؟')) db.collection('services').doc(id).delete(); } }
         
         // --- RENDERING & UI ---
-        function renderServices(filter = '') {
+        function renderServices() {
             const searchBar = document.getElementById('search-bar');
-            if(searchBar) filter = searchBar.value;
-            const filtered = allServices.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
+            const filter = searchBar ? searchBar.value.toLowerCase() : '';
+            const filtered = allServices.filter(s => s.name.toLowerCase().includes(filter));
             const mainGrid = document.getElementById('services-grid');
             const popularGrid = document.getElementById('popular-services-grid');
             if(mainGrid) mainGrid.innerHTML = '';
@@ -211,7 +207,7 @@
         // --- ADMIN PANEL ---
         function loadAdminPanel() {
             const adminContent = document.getElementById('admin-content');
-            adminContent.innerHTML = `<div class="bg-gray-700 p-6 rounded-lg mb-8"><h3 class="text-2xl font-bold mb-4">الإعدادات العامة</h3><form id="settings-form" class="space-y-4"><div><label for="whatsapp-url" class="block mb-1">رابط واتساب</label><input type="url" id="whatsapp-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div><label for="messenger-url" class="block mb-1">رابط مسنجر</label><input type="url" id="messenger-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div><label for="location-url" class="block mb-1">رابط الموقع (خرائط جوجل)</label><input type="url" id="location-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div class="logo-container relative w-48 h-24 bg-gray-800 rounded-md flex items-center justify-center"><img id="admin-logo-preview" class="max-w-full max-h-full"><div class="upload-overlay"><i class="fas fa-upload mr-2"></i> تغيير الشعار</div><input type="file" id="logo-upload" class="absolute inset-0 opacity-0 cursor-pointer"></div><div class="text-right"><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">حفظ الإعدادات</button></div></form></div><div class="bg-gray-700 p-6 rounded-lg"><h3 class="text-2xl font-bold mb-4">إدارة الخدمات</h3><div id="admin-services-list" class="space-y-4 mb-6"><div class="loader"></div></div><button id="add-new-service-form-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700"><i class="fas fa-plus mr-2"></i>إضافة خدمة جديدة</button><div id="service-form-container" class="mt-6 hidden"></div></div>`;
+            adminContent.innerHTML = `<div class="bg-gray-700 p-6 rounded-lg mb-8"><h3 class="text-2xl font-bold mb-4">الإعدادات العامة</h3><form id="settings-form" class="space-y-4"><div><label for="whatsapp-url" class="block mb-1">رابط واتساب</label><input type="url" id="whatsapp-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div><label for="messenger-url" class="block mb-1">رابط مسنجر</label><input type="url" id="messenger-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div><label for="location-url" class="block mb-1">رابط الموقع (خرائط جوجل)</label><input type="url" id="location-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div class="logo-container relative w-48 h-24 bg-gray-800 rounded-md flex items-center justify-center"><img id="admin-logo-preview" class="max-w-full max-h-full"><div class="upload-overlay"><i class="fas fa-upload mr-2"></i> تغيير الشعار</div><input type="file" id="logo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer"></div><div class="text-right"><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">حفظ الإعدادات</button></div></form></div><div class="bg-gray-700 p-6 rounded-lg"><h3 class="text-2xl font-bold mb-4">إدارة الخدمات</h3><div id="admin-services-list" class="space-y-4 mb-6"><div class="loader"></div></div><button id="add-new-service-form-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700"><i class="fas fa-plus mr-2"></i>إضافة خدمة جديدة</button><div id="service-form-container" class="mt-6 hidden"></div></div>`;
             document.getElementById('settings-form').addEventListener('submit', handleSettingsFormSubmit);
             document.getElementById('logo-upload').addEventListener('change', handleLogoUpload);
             db.collection('services').orderBy('name').onSnapshot(snapshot => { document.getElementById('admin-services-list').innerHTML = ''; snapshot.forEach(doc => { const service = { id: doc.id, ...doc.data() }; document.getElementById('admin-services-list').innerHTML += `<div class="flex justify-between items-center bg-gray-800 p-3 rounded"><span>${service.name}</span><div><button data-id="${service.id}" class="edit-service-btn text-yellow-400 hover:text-yellow-300 mr-4">تعديل</button><button data-id="${service.id}" class="delete-service-btn text-red-500 hover:text-red-400">حذف</button></div></div>`; }); });
@@ -219,8 +215,20 @@
         }
         function updateAdminSettingsForm() { document.getElementById('whatsapp-url').value = siteSettings.whatsappUrl || ''; document.getElementById('messenger-url').value = siteSettings.messengerUrl || ''; document.getElementById('location-url').value = siteSettings.locationUrl || ''; document.getElementById('admin-logo-preview').src = siteSettings.logoUrl || 'https://placehold.co/200x80/161b22/4b5563?text=No+Logo'; }
         function handleSettingsFormSubmit(e) { e.preventDefault(); const newSettings = { whatsappUrl: document.getElementById('whatsapp-url').value, messengerUrl: document.getElementById('messenger-url').value, locationUrl: document.getElementById('location-url').value }; db.collection('settings').doc('config').set(newSettings, { merge: true }).then(() => alert('تم حفظ الإعدادات!')).catch(err => alert(`خطأ: ${err.message}`)); }
-        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file) return; ui.spinner.classList.remove('hidden'); const storageRef = storage.ref(`logos/site_logo_${Date.now()}`); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => db.collection('settings').doc('config').set({ logoUrl: downloadURL }, { merge: true })).then(() => alert('تم رفع الشعار بنجاح!')).catch(err => alert(`فشل الرفع: ${err.message}`)).finally(() => ui.spinner.classList.add('hidden')); }
-        function renderServiceForm(service = {}) { /* ... (same as previous version) ... */ }
+        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file || !file.type.startsWith('image/')) return; ui.spinner.classList.remove('hidden'); const storageRef = storage.ref(`logos/site_logo_${Date.now()}`); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => db.collection('settings').doc('config').set({ logoUrl: downloadURL }, { merge: true })).then(() => alert('تم رفع الشعار بنجاح!')).catch(err => alert(`فشل الرفع: ${err.message}`)).finally(() => ui.spinner.classList.add('hidden')); }
+        function renderServiceForm(service = {}) {
+            const { id, name='', description='', image='', popular=false, packages=[] } = service;
+            const isEditing = !!id;
+            const packagesHtml = packages.map(pkg => `<div class="flex items-center space-x-2 space-x-reverse mb-2"><input type="text" placeholder="اسم الباقة" value="${pkg.name}" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md"><input type="number" placeholder="السعر" value="${pkg.price}" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md"><button type="button" class="remove-pkg-btn text-red-500 p-2">&times;</button></div>`).join('');
+            document.getElementById('service-form-container').innerHTML = `<form id="service-form" class="bg-gray-800 p-6 rounded-lg space-y-4"><h4 class="text-lg font-bold">${isEditing ? 'تعديل الخدمة' : 'إضافة خدمة جديدة'}</h4><input type="hidden" id="service-id" value="${id || ''}"><div><label>الاسم</label><input type="text" id="service-name" value="${name}" required class="w-full bg-gray-600 p-2 rounded-md mt-1"></div><div><label>الوصف</label><textarea id="service-desc" class="w-full bg-gray-600 p-2 rounded-md mt-1 h-20">${description}</textarea></div><div><label>رابط الصورة</label><input type="text" id="service-image" value="${image}" class="w-full bg-gray-600 p-2 rounded-md mt-1"></div><div class="flex items-center"><input type="checkbox" id="service-popular" ${popular ? 'checked' : ''} class="h-5 w-5"><label for="service-popular" class="mr-3">عرض في قسم الأكثر طلباً؟</label></div><div><label>الباقات</label><div id="packages-list">${packagesHtml}</div><button type="button" id="add-pkg-btn" class="mt-2 text-green-400">إضافة باقة</button></div><div class="flex justify-end space-x-4 space-x-reverse"><button type="button" id="cancel-edit-btn" class="bg-gray-500 px-4 py-2 rounded">إلغاء</button><button type="submit" class="bg-green-600 px-4 py-2 rounded">حفظ</button></div></form>`;
+            document.getElementById('service-form-container').classList.remove('hidden');
+            document.getElementById('service-form').addEventListener('submit', handleServiceFormSubmit);
+            document.getElementById('cancel-edit-btn').addEventListener('click', () => document.getElementById('service-form-container').classList.add('hidden'));
+            document.getElementById('add-pkg-btn').addEventListener('click', addPackageField);
+            document.getElementById('packages-list').addEventListener('click', e => { if(e.target.classList.contains('remove-pkg-btn')) e.target.parentElement.remove(); });
+        }
+        function addPackageField() { const list = document.getElementById('packages-list'); const div = document.createElement('div'); div.className = 'flex items-center space-x-2 space-x-reverse mb-2'; div.innerHTML = `<input type="text" placeholder="اسم الباقة" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md"><input type="number" placeholder="السعر" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md"><button type="button" class="remove-pkg-btn text-red-500 p-2">&times;</button>`; list.appendChild(div); }
+        function handleServiceFormSubmit(e) { e.preventDefault(); const form = e.target; const id = form.querySelector('#service-id').value; const packages = []; form.querySelectorAll('#packages-list > div').forEach(div => { const name = div.querySelector('.pkg-name').value; const price = parseFloat(div.querySelector('.pkg-price').value); if(name && !isNaN(price)) packages.push({ name, price }); }); const serviceData = { name: form.querySelector('#service-name').value, description: form.querySelector('#service-desc').value, image: form.querySelector('#service-image').value, popular: form.querySelector('#service-popular').checked, packages: packages }; const promise = id ? db.collection('services').doc(id).update(serviceData) : db.collection('services').add(serviceData); promise.then(() => { document.getElementById('service-form-container').classList.add('hidden'); }).catch(console.error); }
         function createServiceCard(service) { return `<div class="card-glow rounded-xl overflow-hidden flex flex-col"><div class="p-6 flex-grow"><div class="flex items-center mb-4"><img src="${service.image || 'https://placehold.co/480x480'}" alt="${service.name}" class="w-16 h-16 object-contain mr-4 ml-2"><div><h3 class="text-2xl font-bold">${service.name}</h3><p class="text-gray-400 text-sm">${service.description}</p></div></div><div class="space-y-3 mt-4">${(service.packages || []).map(pkg => `<div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg"><span class="font-semibold">${pkg.name}</span><button data-service-name="${service.name}" data-package-name="${pkg.name}" data-package-price="${pkg.price}" class="buy-btn bg-amber-500 text-gray-900 text-sm font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-transform transform hover:scale-105">${pkg.price.toLocaleString()} د.ج</button></div>`).join('')}</div></div></div>`; }
         function createReviewCard(review) { let starsHtml = ''; for (let i = 1; i <= 5; i++) { starsHtml += `<i class="fas fa-star ${i <= review.rating ? 'text-amber-400' : 'text-gray-600'}"></i>`; } return `<div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><p class="text-gray-300 mb-4">"${review.text}"</p><div class="flex items-center"><div class="flex">${starsHtml}</div><span class="mr-4 font-bold">- ${review.name}</span></div></div>`; }
         
