@@ -5,56 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر RAWKSN - شحن ألعاب وتطبيقات</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #111827; /* bg-gray-900 */
-        }
-        ::selection { background-color: #f59e0b; color: #111827; }
+        body { font-family: 'Cairo', sans-serif; background-color: #0d1117; color: #c9d1d9; }
+        .view, #admin-panel { display: none; }
+        .view.active, #admin-panel.active { display: block; }
+        .nav-link.active { color: #f59e0b; border-bottom: 2px solid #f59e0b; }
+        ::selection { background-color: #f59e0b; color: #0d1117; }
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-track { background: #161b22; }
         ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 10px; }
-        .card-glow { box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); transition: all 0.3s ease-in-out; }
-        .card-glow:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
-        .admin-view { display: none; }
+        .card-glow { background-color: #161b22; border: 1px solid #30363d; box-shadow: 0 0 15px rgba(245, 158, 11, 0.1); transition: all 0.3s ease-in-out; }
+        .card-glow:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 0 30px rgba(245, 158, 11, 0.3); border-color: #f59e0b; }
+        .star-rating .fa-star { color: #4b5563; cursor: pointer; transition: color 0.2s; }
+        .star-rating .fa-star.selected, .star-rating:hover .fa-star { color: #f59e0b; }
+        .star-rating:hover .fa-star:hover ~ .fa-star { color: #4b5563; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #f59e0b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
-
-    <!-- =============================================================== -->
-    <!-- كود الدردشة المباشرة: الصق الكود الذي تحصل عليه من موقع مثل Tawk.to هنا -->
-    <!-- مثال: -->
-    <!-- <script type="text/javascript"> ... </script> -->
-    <!-- =============================================================== -->
-
 </head>
 <body class="text-white">
 
     <!-- Header -->
-    <header class="bg-gray-800/50 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+    <header class="bg-gray-900/70 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-gray-700">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <a href="#" id="header-logo-link" class="flex items-center space-x-4 space-x-reverse">
+                <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse" data-view="store-view">
                     <img id="header-logo" class="h-12 w-auto" src="http://googleusercontent.com/file_content/1" alt="RAWKSN Logo">
-                    <h1 class="text-2xl font-black tracking-wider">RAWKSN</h1>
                 </a>
-                <div class="flex items-center space-x-4 space-x-reverse">
-                    <a id="whatsapp-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
-                        <i class="fab fa-whatsapp text-2xl"></i>
-                    </a>
-                    <a id="messenger-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400 transition-colors duration-300">
-                        <i class="fab fa-facebook-messenger text-2xl"></i>
-                    </a>
-                    <button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-amber-600 transition-all duration-300 transform hover:scale-105">
+                <nav class="hidden md:flex items-center space-x-6 space-x-reverse">
+                    <a href="#store" class="nav-link active" data-view="store-view">المتجر</a>
+                    <a href="#faq" class="nav-link" data-view="faq-view">الأسئلة الشائعة</a>
+                    <a href="#how-to-order" class="nav-link" data-view="how-to-order-view">كيفية الطلب</a>
+                </nav>
+                <div id="auth-container" class="flex items-center space-x-4 space-x-reverse">
+                    <button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-amber-600">
                         <i class="fas fa-user-shield mr-2"></i> الأدمن
                     </button>
                 </div>
@@ -64,368 +54,283 @@
 
     <!-- Main Content -->
     <main id="main-content" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
-        <!-- Customer View -->
-        <div id="customer-view">
-            <div class="text-center mb-8">
-                <h2 class="text-4xl md:text-5xl font-black text-amber-400 mb-2">متجر RAWKSN</h2>
-                <p class="text-lg text-gray-300">وجهتك الأولى لشحن الألعاب والتطبيقات بأمان وسرعة</p>
-            </div>
-            <!-- Category Filters -->
-            <div id="category-filters" class="flex justify-center flex-wrap gap-3 mb-10">
-                <!-- سيتم ملء فلاتر الأقسام هنا -->
-            </div>
-            <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- سيتم ملء الخدمات هنا -->
-            </div>
+        <!-- Store View -->
+        <div id="store-view" class="view active">
+            <div class="text-center mb-12"><h2 class="text-4xl md:text-5xl font-black text-amber-400 mb-4">متجر RAWKSN للشحن الآمن</h2><p class="text-lg text-gray-400 max-w-2xl mx-auto">وجهتك الأولى لشحن الألعاب والتطبيقات بأمان وسرعة.</p><div class="mt-8"><div class="relative max-w-lg mx-auto"><input type="text" id="search-bar" placeholder="ابحث عن لعبتك أو تطبيقك..." class="w-full bg-gray-800 border-2 border-gray-600 text-white rounded-full py-3 px-6 pr-12 focus:outline-none focus:border-amber-500 transition-colors"><i class="fas fa-search absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400"></i></div></div></div>
+            <div class="mb-16"><h3 class="text-3xl font-bold text-center mb-8 border-b-2 border-amber-500/50 pb-2 inline-block mx-auto">الأكثر طلباً</h3><div id="popular-services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div></div>
+            <h3 class="text-3xl font-bold text-center mb-8">جميع الخدمات</h3>
+            <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div>
+            <div id="reviews-section" class="mt-20"><h3 class="text-3xl font-bold text-center mb-8">آراء عملائنا</h3><div id="reviews-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div><div class="mt-12 max-w-2xl mx-auto"><div class="bg-gray-800 border border-gray-700 rounded-lg p-8"><h4 class="text-2xl font-bold text-center mb-6 text-amber-400">أضف رأيك</h4><form id="review-form" class="space-y-6"><div><label for="reviewer-name" class="block text-sm font-medium text-gray-300 mb-2">اسمك</label><input type="text" id="reviewer-name" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div><label class="block text-sm font-medium text-gray-300 mb-2">تقييمك</label><div id="star-rating-input" class="star-rating flex flex-row-reverse justify-end text-3xl"><i class="far fa-star" data-value="5"></i><i class="far fa-star" data-value="4"></i><i class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="2"></i><i class="far fa-star" data-value="1"></i></div><input type="hidden" id="rating-value" value="0" required></div><div><label for="review-text" class="block text-sm font-medium text-gray-300 mb-2">رأيك</label><textarea id="review-text" rows="4" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></textarea></div><div class="text-center"><button type="submit" class="bg-amber-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-amber-600">إرسال الرأي</button></div></form></div></div></div>
+            <div id="location-section" class="mt-20 text-center"><h3 class="text-3xl font-bold mb-4">تفضل بزيارتنا</h3><p class="text-gray-400 mb-6 max-w-lg mx-auto">نحن متواجدون لخدمتكم. اضغط على الزر أدناه للحصول على الاتجاهات.</p><a href="https://www.google.com/maps/search/?api=1&query=Biskra,Algeria" target="_blank" class="inline-block bg-sky-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-sky-600"><i class="fas fa-map-marker-alt mr-2"></i> عرض على الخريطة</a></div>
         </div>
+        <div id="faq-view" class="view max-w-4xl mx-auto"><h2 class="text-4xl font-black text-amber-400 mb-8 text-center">الأسئلة الشائعة</h2><div class="space-y-6"><div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><h3 class="text-xl font-bold text-amber-400 mb-2">كيف أجد ID الخاص بحسابي؟</h3><p class="text-gray-300">يمكنك العثور على ID الخاص بك في صفحة ملفك الشخصي داخل اللعبة، عادة ما يكون بجانب صورتك الرمزية.</p></div><div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><h3 class="text-xl font-bold text-amber-400 mb-2">كم يستغرق الشحن؟</h3><p class="text-gray-300">تتم معظم عمليات الشحن خلال دقائق قليلة بعد تأكيد الدفع.</p></div></div></div>
+        <div id="how-to-order-view" class="view max-w-4xl mx-auto"><h2 class="text-4xl font-black text-amber-400 mb-8 text-center">كيفية الطلب</h2><div class="bg-gray-800 p-8 rounded-lg border border-gray-700 text-center"><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="flex flex-col items-center"><div class="bg-amber-500 text-gray-900 rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-4">1</div><h3 class="text-xl font-bold mb-2">اختر باقتك</h3><p class="text-gray-400">تصفح خدماتنا واختر الباقة التي تناسبك.</p></div><div class="flex flex-col items-center"><div class="bg-amber-500 text-gray-900 rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-4">2</div><h3 class="text-xl font-bold mb-2">تواصل معنا</h3><p class="text-gray-400">اضغط على زر الشراء وسيتم توجيهك إلى واتساب.</p></div><div class="flex flex-col items-center"><div class="bg-amber-500 text-gray-900 rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-4">3</div><h3 class="text-xl font-bold mb-2">استلم شحنك</h3><p class="text-gray-400">بعد تأكيد الدفع، سيتم شحن حسابك فوراً.</p></div></div></div></div>
 
-        <!-- Admin View (Hidden by default) -->
-        <div id="admin-view" class="admin-view bg-gray-800 p-4 sm:p-8 rounded-xl shadow-2xl">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                <h2 class="text-3xl font-bold text-amber-400">لوحة تحكم الأدمن</h2>
-                <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
-                    <i class="fas fa-sign-out-alt mr-2"></i> خروج
-                </button>
-            </div>
-            
-            <!-- General Settings -->
-            <div class="bg-gray-700 p-6 rounded-lg mb-8">
-                <h3 class="text-2xl font-bold mb-4">الإعدادات العامة</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">رابط الشعار (Logo URL)</label>
-                        <input type="text" id="admin-logo-url" class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 focus:ring-amber-500 focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">رابط واتساب (كامل)</label>
-                        <input type="text" id="admin-whatsapp-url" class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 focus:ring-amber-500 focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">رابط مسنجر (كامل)</label>
-                        <input type="text" id="admin-messenger-url" class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 focus:ring-amber-500 focus:border-amber-500">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">طرق الدفع المتاحة (للعرض فقط)</label>
-                        <div class="flex items-center space-x-4 space-x-reverse">
-                            <label class="flex items-center"><input type="checkbox" id="admin-ccp-enabled" class="form-checkbox h-5 w-5 text-amber-500 bg-gray-600 border-gray-500 rounded focus:ring-amber-500"> <span class="mr-2">CCP</span></label>
-                            <label class="flex items-center"><input type="checkbox" id="admin-baridimob-enabled" class="form-checkbox h-5 w-5 text-amber-500 bg-gray-600 border-gray-500 rounded focus:ring-amber-500"> <span class="mr-2">BaridiMob</span></label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Services Management -->
-            <div id="admin-services-list" class="space-y-6">
-                <!-- سيتم ملء نماذج تعديل الخدمات هنا -->
-            </div>
-            
-            <div class="mt-8 pt-6 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <button id="add-service-btn" class="w-full sm:w-auto bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-lg">
-                    <i class="fas fa-plus-circle mr-2"></i> إضافة خدمة جديدة
-                </button>
-                <button id="save-all-btn" class="w-full sm:w-auto bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors text-lg">
-                    <i class="fas fa-save mr-2"></i> حفظ كل التغييرات
-                </button>
-            </div>
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="bg-gray-800 p-8 rounded-xl shadow-2xl">
+            <h2 class="text-3xl font-bold text-amber-400 mb-6">لوحة تحكم الأدمن</h2>
+            <h3 class="text-xl font-bold mb-4">إدارة الخدمات</h3>
+            <div id="admin-services-list" class="space-y-4 mb-6"><div class="loader"></div></div>
+            <button id="add-new-service-form-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">إضافة خدمة جديدة</button>
+            <div id="service-form-container" class="mt-6 hidden"></div>
         </div>
     </main>
     
-    <!-- Purchase Modal -->
-    <div id="purchase-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 max-w-sm w-full text-center">
-            <h3 class="text-2xl font-bold text-amber-400 mb-2">تأكيد الطلب</h3>
-            <p id="modal-item-name" class="text-lg text-white mb-4"></p>
-            <div class="mb-6">
-                <p class="text-gray-400 mb-2">طرق الدفع المتاحة:</p>
-                <div id="modal-payment-options" class="flex justify-center items-center gap-4">
-                    <!-- سيتم عرض أيقونات الدفع هنا -->
-                </div>
-            </div>
-            <p class="text-gray-300 mb-6">لإتمام الشراء، يرجى التواصل معنا عبر واتساب.</p>
-            <div class="space-x-4 space-x-reverse">
-                 <button id="confirm-purchase-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600 transition-colors">متابعة إلى واتساب</button>
-                 <button id="cancel-purchase-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors">إلغاء</button>
-            </div>
-        </div>
-    </div>
+    <!-- Modals -->
+    <div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"><div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full border-2 border-amber-500"><h3 class="text-2xl font-bold text-amber-400 mb-6 text-center">دخول الأدمن</h3><form id="admin-login-form" class="space-y-6"><div><label for="admin-email" class="block text-sm font-medium text-gray-300 mb-2">البريد الإلكتروني</label><input type="email" id="admin-email" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div><label for="admin-pass" class="block text-sm font-medium text-gray-300 mb-2">كلمة المرور</label><input type="password" id="admin-pass" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div class="flex justify-between items-center pt-4"><button type="button" id="cancel-admin-login" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700">إلغاء</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600">دخول</button></div></form></div></div>
+    <div id="purchase-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"><div class="bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 max-w-sm w-full text-center border-2 border-amber-500"><h3 class="text-2xl font-bold text-amber-400 mb-2">تأكيد الطلب</h3><p id="modal-item-name" class="text-lg text-white mb-6"></p><p class="text-gray-300 mb-6">سيتم توجيهك إلى واتساب لإتمام الشراء.</p><div class="flex justify-center space-x-4 space-x-reverse"><button id="confirm-purchase-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600">متابعة</button><button id="cancel-purchase-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700">إلغاء</button></div></div></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
     <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAUo3tbsbMsSV4a3TTr6_iJEbBa0YEfOdE",
+        authDomain: "rawksn-stor.firebaseapp.com",
+        projectId: "rawksn-stor",
+        storageBucket: "rawksn-stor.appspot.com",
+        messagingSenderId: "267744277154",
+        appId: "1:267744277154:web:a030da7f5c69160fce1dfb",
+        measurementId: "G-GGY5Z79Q3B"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const FieldValue = firebase.firestore.FieldValue;
+
     document.addEventListener('DOMContentLoaded', () => {
-        // --- قاعدة البيانات والإعدادات ---
-        // ملاحظة: في تطبيق حقيقي، يجب أن تكون هذه البيانات في قاعدة بيانات على الخادم.
-        let settings = {
-            logoUrl: 'http://googleusercontent.com/file_content/1',
-            whatsappUrl: 'https://wa.me/213000000000', // استبدل بالرقم الصحيح
-            messengerUrl: 'https://m.me/your-page', // استبدل بالرابط الصحيح
-            payment: {
-                ccp: true,
-                baridimob: true,
+        const ui = {
+            mainContent: document.getElementById('main-content'),
+            views: document.querySelectorAll('.view'),
+            navLinks: document.querySelectorAll('.nav-link'),
+            authContainer: document.getElementById('auth-container'),
+            adminPanel: document.getElementById('admin-panel'),
+            services: {
+                popularGrid: document.getElementById('popular-services-grid'),
+                mainGrid: document.getElementById('services-grid'),
+                adminList: document.getElementById('admin-services-list'),
+                formContainer: document.getElementById('service-form-container')
             },
-            // هام جداً: هذه ليست طريقة آمنة. إنها فقط لمنع المستخدم العادي.
-            // في مشروع حقيقي، يجب استخدام نظام مصادقة على الخادم.
-            adminPassword: '1234' 
+            reviews: {
+                grid: document.getElementById('reviews-grid'),
+                form: document.getElementById('review-form'),
+                starRating: document.getElementById('star-rating-input'),
+                ratingValue: document.getElementById('rating-value')
+            },
+            modals: {
+                admin: document.getElementById('admin-modal'),
+                purchase: document.getElementById('purchase-modal')
+            },
+            searchBar: document.getElementById('search-bar'),
+            logoLink: document.getElementById('logo-link')
         };
 
-        let services = [
-            {
-                id: 'pubg',
-                name: 'شحن شدات ببجي موبايل',
-                category: 'ألعاب',
-                image: 'https://placehold.co/600x400/000000/f59e0b?text=PUBG+Mobile',
-                description: 'شحن فوري وآمن لحسابك عن طريق ID اللاعب فقط.',
-                packages: [
-                    { name: '60 UC', price: 750 },
-                    { name: '325 UC', price: 3500 },
-                    { name: '660 UC', price: 6800 },
-                ]
-            },
-            {
-                id: 'tiktok',
-                name: 'شحن عملات تيك توك',
-                category: 'تطبيقات',
-                image: 'https://placehold.co/600x400/000000/f59e0b?text=TikTok',
-                description: 'ادعم صناع المحتوى المفضلين لديك بشحن سريع.',
-                packages: [
-                    { name: '70 Coins', price: 850 },
-                    { name: '350 Coins', price: 4200 },
-                ]
+        let allServices = [];
+
+        // --- AUTHENTICATION ---
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                ui.authContainer.innerHTML = `<button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg">الخروج</button>`;
+                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+                document.body.classList.add('admin-mode');
+                switchView('admin-panel');
+                loadAdminPanel();
+            } else {
+                ui.authContainer.innerHTML = `<button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
+                document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
+                document.body.classList.remove('admin-mode');
+                switchView('store-view');
             }
-        ];
+        });
 
-        // --- عناصر الواجهة ---
-        const customerView = document.getElementById('customer-view');
-        const adminView = document.getElementById('admin-view');
-        const adminLoginBtn = document.getElementById('admin-login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const saveAllBtn = document.getElementById('save-all-btn');
-        const addServiceBtn = document.getElementById('add-service-btn');
-        const servicesGrid = document.getElementById('services-grid');
-        const adminServicesList = document.getElementById('admin-services-list');
-        const categoryFilters = document.getElementById('category-filters');
-        
-        // --- دوال العرض (Rendering) ---
-        function renderAll() {
-            renderCustomerView();
-            renderAdminView();
-            updateGeneralSettingsUI();
-        }
+        // --- DATA FETCHING ---
+        db.collection('services').orderBy('name').onSnapshot(snapshot => {
+            allServices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderServices();
+        }, console.error);
 
-        function renderCustomerView(filter = 'الكل') {
-            servicesGrid.innerHTML = '';
-            const filteredServices = services.filter(s => filter === 'الكل' || s.category === filter);
+        db.collection('reviews').orderBy('createdAt', 'desc').limit(6).onSnapshot(snapshot => {
+            ui.reviews.grid.innerHTML = snapshot.empty ? `<p class="text-center col-span-full">كن أول من يضيف رأيه!</p>` : '';
+            snapshot.forEach(doc => ui.reviews.grid.innerHTML += createReviewCard(doc.data()));
+        }, console.error);
 
-            if (filteredServices.length === 0) {
-                servicesGrid.innerHTML = `<p class="text-center text-gray-400 col-span-full">لا توجد خدمات في هذا القسم حالياً.</p>`;
+        // --- RENDERING ---
+        function renderServices(filter = '') {
+            const filtered = allServices.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
+            ui.services.mainGrid.innerHTML = '';
+            ui.services.popularGrid.innerHTML = '';
+            if(filtered.length === 0) {
+                const message = filter ? 'لا توجد خدمات تطابق بحثك.' : '<div class="loader"></div>';
+                ui.services.mainGrid.innerHTML = `<p class="text-center col-span-full">${message}</p>`;
             }
-
-            filteredServices.forEach(service => {
-                const packagesHtml = service.packages.map(pkg => `
-                    <div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg">
-                        <span class="font-semibold">${pkg.name}</span>
-                        <button data-service-id="${service.id}" data-package-name="${pkg.name}" class="buy-btn bg-amber-500 text-gray-900 text-sm font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-transform transform hover:scale-105">
-                            ${pkg.price.toLocaleString()} د.ج
-                        </button>
-                    </div>
-                `).join('');
-
-                servicesGrid.innerHTML += `
-                    <div class="bg-gray-800 rounded-xl overflow-hidden card-glow flex flex-col">
-                        <img src="${service.image}" alt="${service.name}" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-2xl font-bold mb-2">${service.name}</h3>
-                            <p class="text-gray-400 mb-4 flex-grow">${service.description}</p>
-                            <div class="space-y-3">${packagesHtml}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            renderCategoryFilters(filter);
-        }
-
-        function renderCategoryFilters(activeFilter) {
-            const categories = ['الكل', ...new Set(services.map(s => s.category))];
-            categoryFilters.innerHTML = categories.map(cat => `
-                <button class="category-btn ${activeFilter === cat ? 'bg-amber-500 text-gray-900' : 'bg-gray-700 text-gray-300'} font-bold py-2 px-5 rounded-full hover:bg-amber-600 hover:text-gray-900 transition-colors duration-300">
-                    ${cat}
-                </button>
-            `).join('');
-        }
-
-        function renderAdminView() {
-            adminServicesList.innerHTML = '';
-            services.forEach((service, serviceIndex) => {
-                const packagesInputsHtml = service.packages.map((pkg, pkgIndex) => `
-                    <div class="flex items-center space-x-2 space-x-reverse mb-2">
-                        <input type="text" value="${pkg.name}" placeholder="اسم الباقة" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md">
-                        <input type="number" value="${pkg.price}" placeholder="السعر" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md">
-                        <button data-service-index="${serviceIndex}" data-package-index="${pkgIndex}" class="remove-pkg-btn text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
-                    </div>
-                `).join('');
-
-                adminServicesList.innerHTML += `
-                    <div class="bg-gray-700 p-4 rounded-lg" data-service-index="${serviceIndex}">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="text-xl font-bold text-amber-400">${service.name}</h4>
-                            <button class="remove-service-btn text-red-500 hover:text-red-400 text-lg"><i class="fas fa-trash-alt"></i> حذف الخدمة</button>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label>اسم الخدمة</label><input type="text" value="${service.name}" class="service-name w-full bg-gray-600 p-2 rounded-md mt-1"></div>
-                            <div><label>القسم</label><input type="text" value="${service.category}" class="service-category w-full bg-gray-600 p-2 rounded-md mt-1"></div>
-                            <div class="md:col-span-2"><label>الوصف</label><textarea class="service-desc w-full bg-gray-600 p-2 rounded-md mt-1 h-20">${service.description}</textarea></div>
-                            <div class="md:col-span-2"><label>رابط الصورة</label><input type="text" value="${service.image}" class="service-image w-full bg-gray-600 p-2 rounded-md mt-1"></div>
-                        </div>
-                        <div class="mt-4">
-                            <h5 class="font-bold mb-2">الباقات</h5>
-                            <div class="packages-list">${packagesInputsHtml}</div>
-                            <button data-service-index="${serviceIndex}" class="add-pkg-btn mt-2 text-green-400 hover:text-green-300"><i class="fas fa-plus-circle mr-2"></i>إضافة باقة</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-        
-        function updateGeneralSettingsUI() {
-            // تحديث واجهة المستخدم العامة (الشعار، الروابط، الخ)
-            document.getElementById('header-logo').src = settings.logoUrl;
-            document.getElementById('whatsapp-link').href = settings.whatsappUrl;
-            document.getElementById('messenger-link').href = settings.messengerUrl;
-            
-            // تحديث حقول الإدخال في لوحة الأدمن
-            document.getElementById('admin-logo-url').value = settings.logoUrl;
-            document.getElementById('admin-whatsapp-url').value = settings.whatsappUrl;
-            document.getElementById('admin-messenger-url').value = settings.messengerUrl;
-            document.getElementById('admin-ccp-enabled').checked = settings.payment.ccp;
-            document.getElementById('admin-baridimob-enabled').checked = settings.payment.baridimob;
-        }
-
-        // --- دوال التحكم (Logic) ---
-        function login() {
-            const pass = prompt('الرجاء إدخال كلمة مرور الأدمن:');
-            if (pass === settings.adminPassword) {
-                customerView.style.display = 'none';
-                adminView.style.display = 'block';
-            } else if (pass) {
-                alert('كلمة المرور غير صحيحة!');
-            }
-        }
-
-        function logout() {
-            customerView.style.display = 'block';
-            adminView.style.display = 'none';
-        }
-
-        function saveAllChanges() {
-            // حفظ الإعدادات العامة
-            settings.logoUrl = document.getElementById('admin-logo-url').value;
-            settings.whatsappUrl = document.getElementById('admin-whatsapp-url').value;
-            settings.messengerUrl = document.getElementById('admin-messenger-url').value;
-            settings.payment.ccp = document.getElementById('admin-ccp-enabled').checked;
-            settings.payment.baridimob = document.getElementById('admin-baridimob-enabled').checked;
-            
-            // حفظ الخدمات
-            const newServices = [];
-            document.querySelectorAll('#admin-services-list > div').forEach(serviceDiv => {
-                const serviceIndex = serviceDiv.dataset.serviceIndex;
-                const newService = {
-                    id: services[serviceIndex]?.id || `service_${Date.now()}`,
-                    name: serviceDiv.querySelector('.service-name').value,
-                    category: serviceDiv.querySelector('.service-category').value,
-                    description: serviceDiv.querySelector('.service-desc').value,
-                    image: serviceDiv.querySelector('.service-image').value,
-                    packages: []
-                };
-
-                serviceDiv.querySelectorAll('.packages-list > div').forEach(pkgDiv => {
-                    newService.packages.push({
-                        name: pkgDiv.querySelector('.pkg-name').value,
-                        price: parseFloat(pkgDiv.querySelector('.pkg-price').value) || 0
-                    });
-                });
-                newServices.push(newService);
-            });
-            
-            services = newServices;
-            alert('تم حفظ كل التغييرات بنجاح!');
-            renderAll();
-            logout();
-        }
-
-        function addNewService() {
-            const newServiceTemplate = {
-                id: `new_${Date.now()}`,
-                name: 'خدمة جديدة',
-                category: 'غير مصنف',
-                image: 'https://placehold.co/600x400/333/ccc?text=New+Service',
-                description: 'وصف الخدمة الجديدة.',
-                packages: [{ name: 'باقة أساسية', price: 1000 }]
-            };
-            services.push(newServiceTemplate);
-            renderAdminView();
-        }
-        
-        // --- ربط الأحداث (Event Listeners) ---
-        adminLoginBtn.addEventListener('click', login);
-        logoutBtn.addEventListener('click', logout);
-        saveAllBtn.addEventListener('click', saveAllChanges);
-        addServiceBtn.addEventListener('click', addNewService);
-
-        adminServicesList.addEventListener('click', e => {
-            const target = e.target.closest('button');
-            if (!target) return;
-
-            const serviceDiv = target.closest('[data-service-index]');
-            const serviceIndex = parseInt(serviceDiv.dataset.serviceIndex);
-
-            if (target.classList.contains('remove-service-btn')) {
-                if (confirm(`هل أنت متأكد من حذف خدمة "${services[serviceIndex].name}"؟`)) {
-                    services.splice(serviceIndex, 1);
-                    renderAdminView();
+            filtered.forEach(service => {
+                const card = createServiceCard(service);
+                ui.services.mainGrid.innerHTML += card;
+                if (service.popular && !filter) {
+                    ui.services.popularGrid.innerHTML += card;
                 }
-            } else if (target.classList.contains('add-pkg-btn')) {
-                services[serviceIndex].packages.push({ name: 'باقة جديدة', price: 0 });
-                renderAdminView();
-            } else if (target.classList.contains('remove-pkg-btn')) {
-                const pkgIndex = parseInt(target.dataset.packageIndex);
-                services[serviceIndex].packages.splice(pkgIndex, 1);
-                renderAdminView();
+            });
+        }
+
+        // --- EVENT LISTENERS ---
+        document.querySelectorAll('.nav-link, #logo-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                switchView(e.currentTarget.dataset.view);
+            });
+        });
+
+        ui.searchBar.addEventListener('input', e => renderServices(e.target.value));
+
+        document.getElementById('admin-login-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const email = e.target['admin-email'].value;
+            const password = e.target['admin-pass'].value;
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => ui.modals.admin.classList.add('hidden'))
+                .catch(error => alert(`فشل الدخول: ${error.message}`));
+        });
+        document.getElementById('cancel-admin-login').addEventListener('click', () => ui.modals.admin.classList.add('hidden'));
+
+        ui.reviews.starRating.addEventListener('click', e => {
+            if (e.target.matches('.fa-star')) {
+                const value = e.target.dataset.value;
+                ui.reviews.ratingValue.value = value;
+                Array.from(ui.reviews.starRating.children).forEach(star => {
+                    star.classList.toggle('selected', star.dataset.value <= value);
+                    star.classList.toggle('fas', star.dataset.value <= value);
+                    star.classList.toggle('far', star.dataset.value > value);
+                });
             }
         });
 
-        categoryFilters.addEventListener('click', e => {
-            if (e.target.classList.contains('category-btn')) {
-                renderCustomerView(e.target.textContent.trim());
+        ui.reviews.form.addEventListener('submit', e => {
+            e.preventDefault();
+            const rating = parseFloat(ui.reviews.ratingValue.value);
+            if (rating === 0) return alert('الرجاء اختيار تقييم بالنجوم.');
+            
+            const newReview = {
+                name: e.target['reviewer-name'].value,
+                text: e.target['review-text'].value,
+                rating: rating,
+                createdAt: FieldValue.serverTimestamp()
+            };
+            db.collection('reviews').add(newReview).then(() => {
+                ui.reviews.form.reset();
+                ui.reviews.ratingValue.value = '0';
+                Array.from(ui.reviews.starRating.children).forEach(star => {
+                    star.classList.remove('selected', 'fas');
+                    star.classList.add('far');
+                });
+            }).catch(console.error);
+        });
+
+        // FIXED: Purchase Modal Logic
+        document.body.addEventListener('click', e => {
+            const buyBtn = e.target.closest('.buy-btn');
+            if(buyBtn) {
+                const { serviceName, packageName, packagePrice } = buyBtn.dataset;
+                const modalItemName = document.getElementById('modal-item-name');
+                modalItemName.textContent = `${serviceName} - ${packageName} (${packagePrice} د.ج)`;
+                const message = `أهلاً RAWKSN، أرغب في شراء: ${serviceName} - باقة (${packageName}) بسعر ${packagePrice} د.ج.`;
+                const whatsappUrl = `https://wa.me/213000000000?text=${encodeURIComponent(message)}`; // !! استبدل هذا الرقم
+                document.getElementById('confirm-purchase-btn').onclick = () => {
+                    window.open(whatsappUrl, '_blank');
+                    ui.modals.purchase.classList.add('hidden');
+                };
+                ui.modals.purchase.classList.remove('hidden');
+            }
+        });
+        document.getElementById('cancel-purchase-btn').addEventListener('click', () => ui.modals.purchase.classList.add('hidden'));
+
+        // --- ADMIN PANEL ---
+        function loadAdminPanel() {
+            const list = ui.services.adminList;
+            db.collection('services').orderBy('name').onSnapshot(snapshot => {
+                list.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const service = { id: doc.id, ...doc.data() };
+                    list.innerHTML += `<div class="flex justify-between items-center bg-gray-700 p-3 rounded"><span>${service.name}</span><div><button data-id="${service.id}" class="edit-service-btn text-yellow-400 hover:text-yellow-300 mr-4">تعديل</button><button data-id="${service.id}" class="delete-service-btn text-red-500 hover:text-red-400">حذف</button></div></div>`;
+                });
+            });
+        }
+        
+        ui.adminPanel.addEventListener('click', e => {
+            const btn = e.target;
+            const id = btn.dataset.id;
+            if(btn.id === 'add-new-service-form-btn') {
+                renderServiceForm();
+            } else if (btn.classList.contains('edit-service-btn')) {
+                const service = allServices.find(s => s.id === id);
+                renderServiceForm(service);
+            } else if (btn.classList.contains('delete-service-btn')) {
+                if(confirm('هل أنت متأكد من حذف الخدمة؟')) {
+                    db.collection('services').doc(id).delete();
+                }
             }
         });
         
-        servicesGrid.addEventListener('click', e => {
-            const buyBtn = e.target.closest('.buy-btn');
-            if (buyBtn) {
-                const { serviceId, packageName } = buyBtn.dataset;
-                const service = services.find(s => s.id === serviceId);
-                const pkg = service.packages.find(p => p.name === packageName);
-                
-                document.getElementById('modal-item-name').textContent = `${service.name} - ${pkg.name}`;
-                
-                const paymentOptionsDiv = document.getElementById('modal-payment-options');
-                paymentOptionsDiv.innerHTML = '';
-                if(settings.payment.ccp) paymentOptionsDiv.innerHTML += `<img src="https://placehold.co/100x50/ffffff/000000?text=CCP" alt="CCP" class="h-10">`;
-                if(settings.payment.baridimob) paymentOptionsDiv.innerHTML += `<img src="https://placehold.co/100x50/ffffff/000000?text=BaridiMob" alt="BaridiMob" class="h-10">`;
+        function renderServiceForm(service = {}) {
+            const { id, name='', description='', image='', popular=false, packages=[] } = service;
+            const isEditing = !!id;
+            const packagesHtml = packages.map(pkg => `<div class="flex items-center space-x-2 space-x-reverse mb-2"><input type="text" placeholder="اسم الباقة" value="${pkg.name}" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md"><input type="number" placeholder="السعر" value="${pkg.price}" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md"><button type="button" class="remove-pkg-btn text-red-500 p-2">&times;</button></div>`).join('');
+            ui.services.formContainer.innerHTML = `<form id="service-form" class="bg-gray-700 p-6 rounded-lg space-y-4"><h4 class="text-lg font-bold">${isEditing ? 'تعديل الخدمة' : 'إضافة خدمة جديدة'}</h4><input type="hidden" id="service-id" value="${id || ''}"><div><label>الاسم</label><input type="text" id="service-name" value="${name}" required class="w-full bg-gray-600 p-2 rounded-md mt-1"></div><div><label>الوصف</label><textarea id="service-desc" class="w-full bg-gray-600 p-2 rounded-md mt-1 h-20">${description}</textarea></div><div><label>رابط الصورة</label><input type="text" id="service-image" value="${image}" class="w-full bg-gray-600 p-2 rounded-md mt-1"></div><div class="flex items-center"><input type="checkbox" id="service-popular" ${popular ? 'checked' : ''} class="h-5 w-5"><label for="service-popular" class="mr-3">عرض في قسم الأكثر طلباً؟</label></div><div><label>الباقات</label><div id="packages-list">${packagesHtml}</div><button type="button" id="add-pkg-btn" class="mt-2 text-green-400">إضافة باقة</button></div><div class="flex justify-end space-x-4 space-x-reverse"><button type="button" id="cancel-edit-btn" class="bg-gray-500 px-4 py-2 rounded">إلغاء</button><button type="submit" class="bg-green-600 px-4 py-2 rounded">حفظ</button></div></form>`;
+            ui.services.formContainer.classList.remove('hidden');
+            document.getElementById('service-form').addEventListener('submit', handleServiceFormSubmit);
+            document.getElementById('cancel-edit-btn').addEventListener('click', () => ui.services.formContainer.classList.add('hidden'));
+            document.getElementById('add-pkg-btn').addEventListener('click', addPackageField);
+            ui.services.formContainer.querySelector('#packages-list').addEventListener('click', e => { if(e.target.classList.contains('remove-pkg-btn')) e.target.parentElement.remove(); });
+        }
 
-                const purchaseModal = document.getElementById('purchase-modal');
-                purchaseModal.classList.remove('hidden');
-                
-                const whatsappMessage = `أهلاً RAWKSN، أرغب في شراء: ${service.name} - باقة (${pkg.name}) بسعر ${pkg.price.toLocaleString()} د.ج.`;
-                document.getElementById('confirm-purchase-btn').onclick = () => {
-                    window.open(`${settings.whatsappUrl}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
-                    purchaseModal.classList.add('hidden');
-                };
-                document.getElementById('cancel-purchase-btn').onclick = () => purchaseModal.classList.add('hidden');
-            }
-        });
+        function addPackageField() {
+            const list = document.getElementById('packages-list');
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-2 space-x-reverse mb-2';
+            div.innerHTML = `<input type="text" placeholder="اسم الباقة" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md"><input type="number" placeholder="السعر" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md"><button type="button" class="remove-pkg-btn text-red-500 p-2">&times;</button>`;
+            list.appendChild(div);
+        }
 
-        // --- التشغيل الأولي ---
-        renderAll();
+        function handleServiceFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.querySelector('#service-id').value;
+            const packages = [];
+            form.querySelectorAll('#packages-list > div').forEach(div => {
+                const name = div.querySelector('.pkg-name').value;
+                const price = parseFloat(div.querySelector('.pkg-price').value);
+                if(name && !isNaN(price)) packages.push({ name, price });
+            });
+            const serviceData = { name: form.querySelector('#service-name').value, description: form.querySelector('#service-desc').value, image: form.querySelector('#service-image').value, popular: form.querySelector('#service-popular').checked, packages: packages };
+            const promise = id ? db.collection('services').doc(id).update(serviceData) : db.collection('services').add(serviceData);
+            promise.then(() => {
+                ui.services.formContainer.innerHTML = '';
+                ui.services.formContainer.classList.add('hidden');
+            }).catch(console.error);
+        }
+
+        // --- HELPERS & INIT ---
+        function switchView(viewId) {
+            if (!viewId) viewId = 'store-view';
+            const isAdminMode = document.body.classList.contains('admin-mode');
+            if (isAdminMode && viewId !== 'admin-panel') return;
+            ui.views.forEach(v => v.classList.toggle('active', v.id === viewId));
+            ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId));
+            document.getElementById('reviews-section').style.display = (viewId === 'store-view') ? 'block' : 'none';
+            document.getElementById('location-section').style.display = (viewId === 'store-view') ? 'block' : 'none';
+        }
+        
+        function createReviewCard(review) {
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) { starsHtml += `<i class="fas fa-star ${i <= review.rating ? 'text-amber-400' : 'text-gray-600'}"></i>`; }
+            return `<div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><p class="text-gray-300 mb-4">"${review.text}"</p><div class="flex items-center"><div class="flex">${starsHtml}</div><span class="mr-4 font-bold">- ${review.name}</span></div></div>`;
+        }
+        
+        function createServiceCard(service) {
+            return `<div class="card-glow rounded-xl overflow-hidden flex flex-col"><div class="p-6 flex-grow"><div class="flex items-center mb-4"><img src="${service.image}" alt="${service.name}" class="w-16 h-16 object-contain mr-4 ml-2"><div><h3 class="text-2xl font-bold">${service.name}</h3><p class="text-gray-400 text-sm">${service.description}</p></div></div><div class="space-y-3 mt-4">${(service.packages || []).map(pkg => `<div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg"><span class="font-semibold">${pkg.name}</span><button data-service-name="${service.name}" data-package-name="${pkg.name}" data-package-price="${pkg.price}" class="buy-btn bg-amber-500 text-gray-900 text-sm font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-transform transform hover:scale-105">${pkg.price.toLocaleString()} د.ج</button></div>`).join('')}</div></div></div>`;
+        }
     });
     </script>
 </body>
