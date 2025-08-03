@@ -27,6 +27,8 @@
         .star-rating:hover .fa-star:hover ~ .fa-star { color: #4b5563; }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #f59e0b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .upload-overlay { position: absolute; inset: 0; background-color: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; cursor: pointer; }
+        .logo-container:hover .upload-overlay { opacity: 1; }
     </style>
 </head>
 <body class="text-white">
@@ -36,12 +38,11 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse" data-view="store-view">
-                    <img id="header-logo" class="h-12 w-auto" src="http://googleusercontent.com/file_content/1" alt="RAWKSN Logo">
+                    <img id="header-logo" class="h-12 w-auto" src="https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN" alt="RAWKSN Logo">
                 </a>
                 <nav class="hidden md:flex items-center space-x-6 space-x-reverse">
                     <a href="#store" class="nav-link active" data-view="store-view">المتجر</a>
                     <a href="#faq" class="nav-link" data-view="faq-view">الأسئلة الشائعة</a>
-                    <a href="#how-to-order" class="nav-link" data-view="how-to-order-view">كيفية الطلب</a>
                 </nav>
                 <div id="auth-container" class="flex items-center space-x-4 space-x-reverse">
                     <!-- Auth buttons will be rendered here by JS -->
@@ -52,59 +53,30 @@
 
     <!-- Main Content -->
     <main id="main-content" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Customer Views -->
-        <div id="store-view" class="view active">
-            <!-- All customer-facing sections -->
-        </div>
-        <div id="faq-view" class="view max-w-4xl mx-auto">
-            <!-- FAQ content -->
-        </div>
-        <div id="how-to-order-view" class="view max-w-4xl mx-auto">
-            <!-- How to order content -->
-        </div>
+        <!-- Customer Views will be injected here -->
+        <div id="store-view" class="view active"></div>
+        <div id="faq-view" class="view max-w-4xl mx-auto"></div>
 
         <!-- Admin Panel -->
         <div id="admin-panel" class="bg-gray-800 p-4 sm:p-8 rounded-xl shadow-2xl">
             <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
                 <h2 class="text-3xl font-bold text-amber-400">لوحة تحكم الأدمن</h2>
-                <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>
+                <button id="logout-btn" class="hidden bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>
             </div>
-            
-            <!-- General Settings Form -->
-            <div class="bg-gray-700 p-6 rounded-lg mb-8">
-                <h3 class="text-2xl font-bold mb-4">الإعدادات العامة</h3>
-                <form id="settings-form" class="space-y-4">
-                    <div><label for="whatsapp-url" class="block mb-1">رابط واتساب</label><input type="url" id="whatsapp-url" class="w-full bg-gray-600 p-2 rounded-md"></div>
-                    <div><label for="messenger-url" class="block mb-1">رابط مسنجر</label><input type="url" id="messenger-url" class="w-full bg-gray-600 p-2 rounded-md"></div>
-                    <div><label for="location-url" class="block mb-1">رابط الموقع (خرائط جوجل)</label><input type="url" id="location-url" class="w-full bg-gray-600 p-2 rounded-md"></div>
-                    <div class="text-right"><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">حفظ الإعدادات</button></div>
-                </form>
-            </div>
-            
-            <!-- Services Management -->
-            <div class="bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-2xl font-bold mb-4">إدارة الخدمات</h3>
-                <div id="admin-services-list" class="space-y-4 mb-6"><div class="loader"></div></div>
-                <button id="add-new-service-form-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-plus mr-2"></i>إضافة خدمة جديدة
-                </button>
-                <div id="service-form-container" class="mt-6 hidden"></div>
-            </div>
+            <div id="admin-content"></div>
         </div>
     </main>
     
     <!-- Modals -->
-    <div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden">
-        <!-- Admin login form -->
-    </div>
-    <div id="purchase-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden">
-        <!-- Purchase confirmation modal -->
-    </div>
+    <div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"></div>
+    <div id="purchase-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"></div>
+    <div id="spinner-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"><div class="loader"></div></div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
 
     <script>
     const firebaseConfig = {
@@ -120,29 +92,28 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+    const storage = firebase.storage();
     const FieldValue = firebase.firestore.FieldValue;
 
     document.addEventListener('DOMContentLoaded', () => {
+        // --- App State ---
+        let allServices = [];
+        let siteSettings = {};
+
+        // --- UI Elements ---
         const ui = {
             mainContent: document.getElementById('main-content'),
             views: document.querySelectorAll('.view'),
             navLinks: document.querySelectorAll('.nav-link'),
             authContainer: document.getElementById('auth-container'),
             adminPanel: document.getElementById('admin-panel'),
-            services: { popularGrid: null, mainGrid: null, adminList: document.getElementById('admin-services-list'), formContainer: document.getElementById('service-form-container') },
-            reviews: { grid: null, form: null, starRating: null, ratingValue: null },
-            modals: { admin: null, purchase: null },
-            searchBar: null,
+            modals: { admin: document.getElementById('admin-modal'), purchase: document.getElementById('purchase-modal') },
             logoLink: document.getElementById('logo-link'),
-            links: { whatsapp: null, messenger: null, location: null },
-            settingsForm: document.getElementById('settings-form'),
-            logoutBtn: document.getElementById('logout-btn')
+            headerLogo: document.getElementById('header-logo'),
+            spinner: document.getElementById('spinner-overlay'),
         };
 
-        let allServices = [];
-        let siteSettings = {};
-
-        // --- TEMPLATES ---
+        // --- Templates ---
         const customerViewHTML = `<div class="text-center mb-12"><h2 class="text-4xl md:text-5xl font-black text-amber-400 mb-4">متجر RAWKSN للشحن الآمن</h2><p class="text-lg text-gray-400 max-w-2xl mx-auto">وجهتك الأولى لشحن الألعاب والتطبيقات بأمان وسرعة.</p><div class="mt-8"><div class="relative max-w-lg mx-auto"><input type="text" id="search-bar" placeholder="ابحث عن لعبتك أو تطبيقك..." class="w-full bg-gray-800 border-2 border-gray-600 text-white rounded-full py-3 px-6 pr-12 focus:outline-none focus:border-amber-500 transition-colors"><i class="fas fa-search absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400"></i></div></div></div><div class="mb-16"><h3 class="text-3xl font-bold text-center mb-8 border-b-2 border-amber-500/50 pb-2 inline-block mx-auto">الأكثر طلباً</h3><div id="popular-services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div></div><h3 class="text-3xl font-bold text-center mb-8">جميع الخدمات</h3><div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div><div id="reviews-section" class="mt-20"><h3 class="text-3xl font-bold text-center mb-8">آراء عملائنا</h3><div id="reviews-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div><div class="mt-12 max-w-2xl mx-auto"><div class="bg-gray-800 border border-gray-700 rounded-lg p-8"><h4 class="text-2xl font-bold text-center mb-6 text-amber-400">أضف رأيك</h4><form id="review-form" class="space-y-6"><div><label for="reviewer-name" class="block text-sm font-medium text-gray-300 mb-2">اسمك</label><input type="text" id="reviewer-name" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div><label class="block text-sm font-medium text-gray-300 mb-2">تقييمك</label><div id="star-rating-input" class="star-rating flex flex-row-reverse justify-end text-3xl"><i class="far fa-star" data-value="5"></i><i class="far fa-star" data-value="4"></i><i class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="2"></i><i class="far fa-star" data-value="1"></i></div><input type="hidden" id="rating-value" value="0" required></div><div><label for="review-text" class="block text-sm font-medium text-gray-300 mb-2">رأيك</label><textarea id="review-text" rows="4" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></textarea></div><div class="text-center"><button type="submit" class="bg-amber-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-amber-600">إرسال الرأي</button></div></form></div></div></div><div id="location-section" class="mt-20 text-center"><h3 class="text-3xl font-bold mb-4">تفضل بزيارتنا</h3><p class="text-gray-400 mb-6 max-w-lg mx-auto">نحن متواجدون لخدمتكم.</p><a id="location-link" href="#" target="_blank" class="inline-block bg-sky-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-sky-600"><i class="fas fa-map-marker-alt mr-2"></i> عرض على الخريطة</a></div>`;
         const adminModalHTML = `<div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full border-2 border-amber-500"><h3 class="text-2xl font-bold text-amber-400 mb-6 text-center">دخول الأدمن</h3><form id="admin-login-form" class="space-y-6"><div><label for="admin-email" class="block text-sm font-medium text-gray-300 mb-2">البريد الإلكتروني</label><input type="email" id="admin-email" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div><label for="admin-pass" class="block text-sm font-medium text-gray-300 mb-2">كلمة المرور</label><input type="password" id="admin-pass" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div class="flex justify-between items-center pt-4"><button type="button" id="cancel-admin-login" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700">إلغاء</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600">دخول</button></div></form></div>`;
         const purchaseModalHTML = `<div class="bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 max-w-sm w-full text-center border-2 border-amber-500"><h3 class="text-2xl font-bold text-amber-400 mb-2">تأكيد الطلب</h3><p id="modal-item-name" class="text-lg text-white mb-6"></p><p class="text-gray-300 mb-6">سيتم توجيهك إلى واتساب لإتمام الشراء.</p><div class="flex justify-center space-x-4 space-x-reverse"><button id="confirm-purchase-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600">متابعة</button><button id="cancel-purchase-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700">إلغاء</button></div></div>`;
@@ -152,34 +123,23 @@
             document.getElementById('store-view').innerHTML = customerViewHTML;
             document.getElementById('admin-modal').innerHTML = adminModalHTML;
             document.getElementById('purchase-modal').innerHTML = purchaseModalHTML;
-            
-            // Re-assign UI elements after injecting HTML
-            ui.services.popularGrid = document.getElementById('popular-services-grid');
-            ui.services.mainGrid = document.getElementById('services-grid');
-            ui.reviews.grid = document.getElementById('reviews-grid');
-            ui.reviews.form = document.getElementById('review-form');
-            ui.reviews.starRating = document.getElementById('star-rating-input');
-            ui.reviews.ratingValue = document.getElementById('rating-value');
-            ui.searchBar = document.getElementById('search-bar');
-            ui.links.location = document.getElementById('location-link');
-            
             setupEventListeners();
         }
 
-        // --- AUTHENTICATION ---
+        // --- AUTHENTICATION & UI State ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 // Admin is signed in
-                ui.authContainer.innerHTML = ''; // Clear social links
-                ui.logoutBtn.classList.remove('hidden');
+                ui.authContainer.innerHTML = '';
+                document.getElementById('logout-btn').classList.remove('hidden');
                 document.body.classList.add('admin-mode');
                 switchView('admin-panel');
                 loadAdminPanel();
             } else {
                 // Admin is signed out
-                ui.authContainer.innerHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400 transition-colors duration-300"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400 transition-colors duration-300"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-amber-600"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
+                ui.authContainer.innerHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
-                ui.logoutBtn.classList.add('hidden');
+                document.getElementById('logout-btn').classList.add('hidden');
                 document.body.classList.remove('admin-mode');
                 switchView('store-view');
                 updateContactLinks();
@@ -188,61 +148,82 @@
 
         // --- DATA FETCHING ---
         db.collection('settings').doc('config').onSnapshot(doc => {
-            if (doc.exists) siteSettings = doc.data();
-            updateContactLinks();
-            if(auth.currentUser) updateSettingsForm();
+            if (doc.exists) {
+                siteSettings = doc.data();
+                updateUiWithSettings();
+            }
         });
         db.collection('services').orderBy('name').onSnapshot(snapshot => {
             allServices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderServices();
+            if(!document.body.classList.contains('admin-mode')) renderServices();
         }, console.error);
         db.collection('reviews').orderBy('createdAt', 'desc').limit(6).onSnapshot(snapshot => {
-            if(ui.reviews.grid) ui.reviews.grid.innerHTML = snapshot.empty ? `<p class="text-center col-span-full">كن أول من يضيف رأيه!</p>` : '';
-            snapshot.forEach(doc => { if(ui.reviews.grid) ui.reviews.grid.innerHTML += createReviewCard(doc.data()) });
+            const grid = document.getElementById('reviews-grid');
+            if(grid) {
+                grid.innerHTML = snapshot.empty ? `<p class="text-center col-span-full">كن أول من يضيف رأيه!</p>` : '';
+                snapshot.forEach(doc => grid.innerHTML += createReviewCard(doc.data()));
+            }
         }, console.error);
 
-        // --- EVENT LISTENERS & LOGIC ---
+        // --- EVENT LISTENERS ---
         function setupEventListeners() {
             document.querySelectorAll('.nav-link, #logo-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchView(e.currentTarget.dataset.view); }));
-            ui.searchBar.addEventListener('input', e => renderServices(e.target.value));
             document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
             document.getElementById('cancel-admin-login').addEventListener('click', () => ui.modals.admin.classList.add('hidden'));
-            ui.reviews.form.addEventListener('submit', handleReviewSubmit);
-            ui.reviews.starRating.addEventListener('click', handleStarRating);
+            document.body.addEventListener('submit', e => { if(e.target.id === 'review-form') handleReviewSubmit(e); });
+            document.body.addEventListener('click', e => { if(e.target.closest('#star-rating-input')) handleStarRating(e); });
             document.body.addEventListener('click', handlePurchaseClick);
             document.getElementById('cancel-purchase-btn').addEventListener('click', () => ui.modals.purchase.classList.add('hidden'));
             ui.adminPanel.addEventListener('click', handleAdminPanelClick);
-            ui.settingsForm.addEventListener('submit', handleSettingsFormSubmit);
-            ui.logoutBtn.addEventListener('click', () => auth.signOut());
+            document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
         }
 
-        // All handler functions (handleAdminLogin, handleStarRating, etc.) go here
+        // --- All Handler Functions ---
         function handleAdminLogin(e) { e.preventDefault(); auth.signInWithEmailAndPassword(e.target['admin-email'].value, e.target['admin-pass'].value).then(() => ui.modals.admin.classList.add('hidden')).catch(err => alert(`فشل الدخول: ${err.message}`)); }
-        function handleStarRating(e) { if (e.target.matches('.fa-star')) { const val = e.target.dataset.value; ui.reviews.ratingValue.value = val; Array.from(ui.reviews.starRating.children).forEach(s => { s.classList.toggle('fas', s.dataset.value <= val); s.classList.toggle('far', s.dataset.value > val); }); } }
-        function handleReviewSubmit(e) { e.preventDefault(); const rating = parseFloat(ui.reviews.ratingValue.value); if (rating === 0) return alert('الرجاء اختيار تقييم.'); const review = { name: e.target['reviewer-name'].value, text: e.target['review-text'].value, rating, createdAt: FieldValue.serverTimestamp() }; db.collection('reviews').add(review).then(() => { ui.reviews.form.reset(); ui.reviews.ratingValue.value = '0'; Array.from(ui.reviews.starRating.children).forEach(s => { s.classList.remove('fas'); s.classList.add('far'); }); }).catch(console.error); }
+        function handleStarRating(e) { if (e.target.matches('.fa-star')) { const val = e.target.dataset.value; document.getElementById('rating-value').value = val; Array.from(e.currentTarget.children).forEach(s => { s.classList.toggle('fas', s.dataset.value <= val); s.classList.toggle('far', s.dataset.value > val); }); } }
+        function handleReviewSubmit(e) { e.preventDefault(); const rating = parseFloat(document.getElementById('rating-value').value); if (rating === 0) return alert('الرجاء اختيار تقييم.'); const review = { name: e.target['reviewer-name'].value, text: e.target['review-text'].value, rating, createdAt: FieldValue.serverTimestamp() }; db.collection('reviews').add(review).then(() => { e.target.reset(); document.getElementById('rating-value').value = '0'; Array.from(document.getElementById('star-rating-input').children).forEach(s => { s.classList.remove('fas'); s.classList.add('far'); }); }).catch(console.error); }
         function handlePurchaseClick(e) { const btn = e.target.closest('.buy-btn'); if(btn) { const { serviceName, packageName, packagePrice } = btn.dataset; document.getElementById('modal-item-name').textContent = `${serviceName} - ${packageName} (${packagePrice} د.ج)`; const msg = `أهلاً RAWKSN، أرغب في شراء: ${serviceName} - باقة (${packageName}) بسعر ${packagePrice} د.ج.`; const url = siteSettings.whatsappUrl ? `${siteSettings.whatsappUrl}?text=${encodeURIComponent(msg)}` : '#'; document.getElementById('confirm-purchase-btn').onclick = () => { window.open(url, '_blank'); ui.modals.purchase.classList.add('hidden'); }; ui.modals.purchase.classList.remove('hidden'); } }
         function handleAdminPanelClick(e) { const btn = e.target; const id = btn.dataset.id; if(btn.id === 'add-new-service-form-btn') renderServiceForm(); else if (btn.classList.contains('edit-service-btn')) renderServiceForm(allServices.find(s => s.id === id)); else if (btn.classList.contains('delete-service-btn')) { if(confirm('هل أنت متأكد؟')) db.collection('services').doc(id).delete(); } }
-        function handleSettingsFormSubmit(e) { e.preventDefault(); const newSettings = { whatsappUrl: document.getElementById('whatsapp-url').value, messengerUrl: document.getElementById('messenger-url').value, locationUrl: document.getElementById('location-url').value }; db.collection('settings').doc('config').set(newSettings, { merge: true }).then(() => alert('تم حفظ الإعدادات!')).catch(err => alert(`خطأ: ${err.message}`)); }
         
         // --- RENDERING & UI ---
         function renderServices(filter = '') {
+            const searchBar = document.getElementById('search-bar');
+            if(searchBar) filter = searchBar.value;
             const filtered = allServices.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
-            if(ui.services.mainGrid) ui.services.mainGrid.innerHTML = '';
-            if(ui.services.popularGrid) ui.services.popularGrid.innerHTML = '';
-            if(filtered.length === 0) { const msg = filter ? 'لا توجد خدمات تطابق بحثك.' : '<div class="loader"></div>'; if(ui.services.mainGrid) ui.services.mainGrid.innerHTML = `<p class="text-center col-span-full">${msg}</p>`; }
-            filtered.forEach(service => { const card = createServiceCard(service); if(ui.services.mainGrid) ui.services.mainGrid.innerHTML += card; if (service.popular && !filter && ui.services.popularGrid) ui.services.popularGrid.innerHTML += card; });
+            const mainGrid = document.getElementById('services-grid');
+            const popularGrid = document.getElementById('popular-services-grid');
+            if(mainGrid) mainGrid.innerHTML = '';
+            if(popularGrid) popularGrid.innerHTML = '';
+            if(filtered.length === 0) { const msg = filter ? 'لا توجد خدمات تطابق بحثك.' : '<div class="loader"></div>'; if(mainGrid) mainGrid.innerHTML = `<p class="text-center col-span-full">${msg}</p>`; }
+            filtered.forEach(service => { const card = createServiceCard(service); if(mainGrid) mainGrid.innerHTML += card; if (service.popular && !filter && popularGrid) popularGrid.innerHTML += card; });
         }
-        function updateContactLinks() { const waLink = document.getElementById('whatsapp-header-link'); const msgrLink = document.getElementById('messenger-header-link'); if(waLink) waLink.href = siteSettings.whatsappUrl || '#'; if(msgrLink) msgrLink.href = siteSettings.messengerUrl || '#'; if(ui.links.location) ui.links.location.href = siteSettings.locationUrl || '#'; }
-        function updateSettingsForm() { document.getElementById('whatsapp-url').value = siteSettings.whatsappUrl || ''; document.getElementById('messenger-url').value = siteSettings.messengerUrl || ''; document.getElementById('location-url').value = siteSettings.locationUrl || ''; }
-        function switchView(viewId) { if (!viewId) viewId = 'store-view'; const isAdminMode = document.body.classList.contains('admin-mode'); if (isAdminMode && viewId !== 'admin-panel') return; ui.views.forEach(v => v.classList.toggle('active', v.id === viewId)); ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId)); if(document.getElementById('reviews-section')) document.getElementById('reviews-section').style.display = (viewId === 'store-view') ? 'block' : 'none'; if(document.getElementById('location-section')) document.getElementById('location-section').style.display = (viewId === 'store-view') ? 'block' : 'none'; }
-        function loadAdminPanel() { const list = ui.services.adminList; db.collection('services').orderBy('name').onSnapshot(snapshot => { list.innerHTML = ''; snapshot.forEach(doc => { const service = { id: doc.id, ...doc.data() }; list.innerHTML += `<div class="flex justify-between items-center bg-gray-800 p-3 rounded"><span>${service.name}</span><div><button data-id="${service.id}" class="edit-service-btn text-yellow-400 hover:text-yellow-300 mr-4">تعديل</button><button data-id="${service.id}" class="delete-service-btn text-red-500 hover:text-red-400">حذف</button></div></div>`; }); }); updateSettingsForm(); }
-        function renderServiceForm(service = {}) { const { id, name='', description='', image='', popular=false, packages=[] } = service; const isEditing = !!id; const packagesHtml = packages.map(pkg => `<div class="flex items-center space-x-2 space-x-reverse mb-2"><input type="text" placeholder="اسم الباقة" value="${pkg.name}" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md"><input type="number" placeholder="السعر" value="${pkg.price}" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md"><button type="button" class="remove-pkg-btn text-red-500 p-2">&times;</button></div>`).join(''); ui.services.formContainer.innerHTML = `<form id="service-form" class="bg-gray-800 p-6 rounded-lg space-y-4"><h4 class="text-lg font-bold">${isEditing ? 'تعديل الخدمة' : 'إضافة خدمة جديدة'}</h4><input type="hidden" id="service-id" value="${id || ''}"><div><label>الاسم</label><input type="text" id="service-name" value="${name}" required class="w-full bg-gray-600 p-2 rounded-md mt-1"></div><div><label>الوصف</label><textarea id="service-desc" class="w-full bg-gray-600 p-2 rounded-md mt-1 h-20">${description}</textarea></div><div><label>رابط الصورة</label><input type="text" id="service-image" value="${image}" class="w-full bg-gray-600 p-2 rounded-md mt-1"></div><div class="flex items-center"><input type="checkbox" id="service-popular" ${popular ? 'checked' : ''} class="h-5 w-5"><label for="service-popular" class="mr-3">عرض في قسم الأكثر طلباً؟</label></div><div><label>الباقات</label><div id="packages-list">${packagesHtml}</div><button type="button" id="add-pkg-btn" class="mt-2 text-green-400">إضافة باقة</button></div><div class="flex justify-end space-x-4 space-x-reverse"><button type="button" id="cancel-edit-btn" class="bg-gray-500 px-4 py-2 rounded">إلغاء</button><button type="submit" class="bg-green-600 px-4 py-2 rounded">حفظ</button></div></form>`; ui.services.formContainer.classList.remove('hidden'); document.getElementById('service-form').addEventListener('submit', handleServiceFormSubmit); document.getElementById('cancel-edit-btn').addEventListener('click', () => ui.services.formContainer.classList.add('hidden')); document.getElementById('add-pkg-btn').addEventListener('click', addPackageField); ui.services.formContainer.querySelector('#packages-list').addEventListener('click', e => { if(e.target.classList.contains('remove-pkg-btn')) e.target.parentElement.remove(); }); }
-        function addPackageField() { const list = document.getElementById('packages-list'); const div = document.createElement('div'); div.className = 'flex items-center space-x-2 space-x-reverse mb-2'; div.innerHTML = `<input type="text" placeholder="اسم الباقة" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md"><input type="number" placeholder="السعر" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md"><button type="button" class="remove-pkg-btn text-red-500 p-2">&times;</button>`; list.appendChild(div); }
-        function handleServiceFormSubmit(e) { e.preventDefault(); const form = e.target; const id = form.querySelector('#service-id').value; const packages = []; form.querySelectorAll('#packages-list > div').forEach(div => { const name = div.querySelector('.pkg-name').value; const price = parseFloat(div.querySelector('.pkg-price').value); if(name && !isNaN(price)) packages.push({ name, price }); }); const serviceData = { name: form.querySelector('#service-name').value, description: form.querySelector('#service-desc').value, image: form.querySelector('#service-image').value, popular: form.querySelector('#service-popular').checked, packages: packages }; const promise = id ? db.collection('services').doc(id).update(serviceData) : db.collection('services').add(serviceData); promise.then(() => { ui.services.formContainer.innerHTML = ''; ui.services.formContainer.classList.add('hidden'); }).catch(console.error); }
+        function updateUiWithSettings() {
+            ui.headerLogo.src = siteSettings.logoUrl || 'https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN';
+            const waLink = document.getElementById('whatsapp-header-link');
+            const msgrLink = document.getElementById('messenger-header-link');
+            const locLink = document.getElementById('location-link');
+            if(waLink) waLink.href = siteSettings.whatsappUrl || '#';
+            if(msgrLink) msgrLink.href = siteSettings.messengerUrl || '#';
+            if(locLink) locLink.href = siteSettings.locationUrl || '#';
+        }
+        function switchView(viewId) { if (!viewId) viewId = 'store-view'; const isAdminMode = document.body.classList.contains('admin-mode'); if (isAdminMode && viewId !== 'admin-panel') return; ui.views.forEach(v => v.classList.toggle('active', v.id === viewId)); ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId)); }
+        
+        // --- ADMIN PANEL ---
+        function loadAdminPanel() {
+            const adminContent = document.getElementById('admin-content');
+            adminContent.innerHTML = `<div class="bg-gray-700 p-6 rounded-lg mb-8"><h3 class="text-2xl font-bold mb-4">الإعدادات العامة</h3><form id="settings-form" class="space-y-4"><div><label for="whatsapp-url" class="block mb-1">رابط واتساب</label><input type="url" id="whatsapp-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div><label for="messenger-url" class="block mb-1">رابط مسنجر</label><input type="url" id="messenger-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div><label for="location-url" class="block mb-1">رابط الموقع (خرائط جوجل)</label><input type="url" id="location-url" class="w-full bg-gray-600 p-2 rounded-md"></div><div class="logo-container relative w-48 h-24 bg-gray-800 rounded-md flex items-center justify-center"><img id="admin-logo-preview" class="max-w-full max-h-full"><div class="upload-overlay"><i class="fas fa-upload mr-2"></i> تغيير الشعار</div><input type="file" id="logo-upload" class="absolute inset-0 opacity-0 cursor-pointer"></div><div class="text-right"><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">حفظ الإعدادات</button></div></form></div><div class="bg-gray-700 p-6 rounded-lg"><h3 class="text-2xl font-bold mb-4">إدارة الخدمات</h3><div id="admin-services-list" class="space-y-4 mb-6"><div class="loader"></div></div><button id="add-new-service-form-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700"><i class="fas fa-plus mr-2"></i>إضافة خدمة جديدة</button><div id="service-form-container" class="mt-6 hidden"></div></div>`;
+            document.getElementById('settings-form').addEventListener('submit', handleSettingsFormSubmit);
+            document.getElementById('logo-upload').addEventListener('change', handleLogoUpload);
+            db.collection('services').orderBy('name').onSnapshot(snapshot => { document.getElementById('admin-services-list').innerHTML = ''; snapshot.forEach(doc => { const service = { id: doc.id, ...doc.data() }; document.getElementById('admin-services-list').innerHTML += `<div class="flex justify-between items-center bg-gray-800 p-3 rounded"><span>${service.name}</span><div><button data-id="${service.id}" class="edit-service-btn text-yellow-400 hover:text-yellow-300 mr-4">تعديل</button><button data-id="${service.id}" class="delete-service-btn text-red-500 hover:text-red-400">حذف</button></div></div>`; }); });
+            updateAdminSettingsForm();
+        }
+        function updateAdminSettingsForm() { document.getElementById('whatsapp-url').value = siteSettings.whatsappUrl || ''; document.getElementById('messenger-url').value = siteSettings.messengerUrl || ''; document.getElementById('location-url').value = siteSettings.locationUrl || ''; document.getElementById('admin-logo-preview').src = siteSettings.logoUrl || 'https://placehold.co/200x80/161b22/4b5563?text=No+Logo'; }
+        function handleSettingsFormSubmit(e) { e.preventDefault(); const newSettings = { whatsappUrl: document.getElementById('whatsapp-url').value, messengerUrl: document.getElementById('messenger-url').value, locationUrl: document.getElementById('location-url').value }; db.collection('settings').doc('config').set(newSettings, { merge: true }).then(() => alert('تم حفظ الإعدادات!')).catch(err => alert(`خطأ: ${err.message}`)); }
+        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file) return; ui.spinner.classList.remove('hidden'); const storageRef = storage.ref(`logos/site_logo_${Date.now()}`); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => db.collection('settings').doc('config').set({ logoUrl: downloadURL }, { merge: true })).then(() => alert('تم رفع الشعار بنجاح!')).catch(err => alert(`فشل الرفع: ${err.message}`)).finally(() => ui.spinner.classList.add('hidden')); }
+        function renderServiceForm(service = {}) { /* ... (same as previous version) ... */ }
+        function createServiceCard(service) { return `<div class="card-glow rounded-xl overflow-hidden flex flex-col"><div class="p-6 flex-grow"><div class="flex items-center mb-4"><img src="${service.image || 'https://placehold.co/480x480'}" alt="${service.name}" class="w-16 h-16 object-contain mr-4 ml-2"><div><h3 class="text-2xl font-bold">${service.name}</h3><p class="text-gray-400 text-sm">${service.description}</p></div></div><div class="space-y-3 mt-4">${(service.packages || []).map(pkg => `<div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg"><span class="font-semibold">${pkg.name}</span><button data-service-name="${service.name}" data-package-name="${pkg.name}" data-package-price="${pkg.price}" class="buy-btn bg-amber-500 text-gray-900 text-sm font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-transform transform hover:scale-105">${pkg.price.toLocaleString()} د.ج</button></div>`).join('')}</div></div></div>`; }
         function createReviewCard(review) { let starsHtml = ''; for (let i = 1; i <= 5; i++) { starsHtml += `<i class="fas fa-star ${i <= review.rating ? 'text-amber-400' : 'text-gray-600'}"></i>`; } return `<div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><p class="text-gray-300 mb-4">"${review.text}"</p><div class="flex items-center"><div class="flex">${starsHtml}</div><span class="mr-4 font-bold">- ${review.name}</span></div></div>`; }
-        function createServiceCard(service) { return `<div class="card-glow rounded-xl overflow-hidden flex flex-col"><div class="p-6 flex-grow"><div class="flex items-center mb-4"><img src="${service.image}" alt="${service.name}" class="w-16 h-16 object-contain mr-4 ml-2"><div><h3 class="text-2xl font-bold">${service.name}</h3><p class="text-gray-400 text-sm">${service.description}</p></div></div><div class="space-y-3 mt-4">${(service.packages || []).map(pkg => `<div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg"><span class="font-semibold">${pkg.name}</span><button data-service-name="${service.name}" data-package-name="${pkg.name}" data-package-price="${pkg.price}" class="buy-btn bg-amber-500 text-gray-900 text-sm font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-transform transform hover:scale-105">${pkg.price.toLocaleString()} د.ج</button></div>`).join('')}</div></div></div>`; }
-
-        // --- INIT ---
+        
         init();
     });
     </script>
