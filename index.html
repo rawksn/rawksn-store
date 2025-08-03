@@ -40,13 +40,30 @@
                 <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse" data-view="store-view">
                     <img id="header-logo" class="h-12 w-auto" src="https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN" alt="RAWKSN Logo">
                 </a>
+                <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center space-x-6 space-x-reverse">
                     <a href="#store" class="nav-link active" data-view="store-view">المتجر</a>
                     <a href="#faq" class="nav-link" data-view="faq-view">الأسئلة الشائعة</a>
+                    <a href="#how-to-order" class="nav-link" data-view="how-to-order-view">كيفية الطلب</a>
                 </nav>
-                <div id="auth-container" class="flex items-center space-x-4 space-x-reverse">
-                    <!-- Auth buttons will be rendered here by JS -->
+                <div id="auth-container" class="hidden md:flex items-center space-x-4 space-x-reverse">
+                    <!-- Desktop Auth buttons will be rendered here by JS -->
                 </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="hamburger-btn" class="text-gray-300 hover:text-amber-400 focus:outline-none">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-900">
+            <a href="#store" class="mobile-nav-link block text-gray-300 hover:bg-gray-800 hover:text-amber-400 px-4 py-3" data-view="store-view">المتجر</a>
+            <a href="#faq" class="mobile-nav-link block text-gray-300 hover:bg-gray-800 hover:text-amber-400 px-4 py-3" data-view="faq-view">الأسئلة الشائعة</a>
+            <a href="#how-to-order" class="mobile-nav-link block text-gray-300 hover:bg-gray-800 hover:text-amber-400 px-4 py-3" data-view="how-to-order-view">كيفية الطلب</a>
+            <div id="mobile-auth-container" class="px-4 py-3 border-t border-gray-700">
+                <!-- Mobile Auth buttons will be rendered here by JS -->
             </div>
         </div>
     </header>
@@ -56,6 +73,7 @@
         <!-- Customer Views will be injected here -->
         <div id="store-view" class="view active"></div>
         <div id="faq-view" class="view max-w-4xl mx-auto"></div>
+        <div id="how-to-order-view" class="view max-w-4xl mx-auto"></div>
 
         <!-- Admin Panel -->
         <div id="admin-panel" class="bg-gray-800 p-4 sm:p-8 rounded-xl shadow-2xl">
@@ -105,21 +123,28 @@
             views: document.querySelectorAll('.view'),
             navLinks: document.querySelectorAll('.nav-link'),
             authContainer: document.getElementById('auth-container'),
+            mobileAuthContainer: document.getElementById('mobile-auth-container'),
             adminPanel: document.getElementById('admin-panel'),
             modals: { admin: document.getElementById('admin-modal'), purchase: document.getElementById('purchase-modal') },
             logoLink: document.getElementById('logo-link'),
             headerLogo: document.getElementById('header-logo'),
             spinner: document.getElementById('spinner-overlay'),
+            hamburgerBtn: document.getElementById('hamburger-btn'),
+            mobileMenu: document.getElementById('mobile-menu'),
         };
 
         // --- Templates ---
         const customerViewHTML = `<div class="text-center mb-12"><h2 class="text-4xl md:text-5xl font-black text-amber-400 mb-4">متجر RAWKSN للشحن الآمن</h2><p class="text-lg text-gray-400 max-w-2xl mx-auto">وجهتك الأولى لشحن الألعاب والتطبيقات بأمان وسرعة.</p><div class="mt-8"><div class="relative max-w-lg mx-auto"><input type="text" id="search-bar" placeholder="ابحث عن لعبتك أو تطبيقك..." class="w-full bg-gray-800 border-2 border-gray-600 text-white rounded-full py-3 px-6 pr-12 focus:outline-none focus:border-amber-500 transition-colors"><i class="fas fa-search absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400"></i></div></div></div><div class="mb-16"><h3 class="text-3xl font-bold text-center mb-8 border-b-2 border-amber-500/50 pb-2 inline-block mx-auto">الأكثر طلباً</h3><div id="popular-services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div></div><h3 class="text-3xl font-bold text-center mb-8">جميع الخدمات</h3><div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div><div id="reviews-section" class="mt-20"><h3 class="text-3xl font-bold text-center mb-8">آراء عملائنا</h3><div id="reviews-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="loader"></div></div><div class="mt-12 max-w-2xl mx-auto"><div class="bg-gray-800 border border-gray-700 rounded-lg p-8"><h4 class="text-2xl font-bold text-center mb-6 text-amber-400">أضف رأيك</h4><form id="review-form" class="space-y-6"><div><label for="reviewer-name" class="block text-sm font-medium text-gray-300 mb-2">اسمك</label><input type="text" id="reviewer-name" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div><label class="block text-sm font-medium text-gray-300 mb-2">تقييمك</label><div id="star-rating-input" class="star-rating flex flex-row-reverse justify-end text-3xl"><i class="far fa-star" data-value="5"></i><i class="far fa-star" data-value="4"></i><i class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="2"></i><i class="far fa-star" data-value="1"></i></div><input type="hidden" id="rating-value" value="0" required></div><div><label for="review-text" class="block text-sm font-medium text-gray-300 mb-2">رأيك</label><textarea id="review-text" rows="4" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></textarea></div><div class="text-center"><button type="submit" class="bg-amber-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-amber-600">إرسال الرأي</button></div></form></div></div></div><div id="location-section" class="mt-20 text-center"><h3 class="text-3xl font-bold mb-4">تفضل بزيارتنا</h3><p class="text-gray-400 mb-6 max-w-lg mx-auto">نحن متواجدون لخدمتكم.</p><a id="location-link" href="#" target="_blank" class="inline-block bg-sky-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-sky-600"><i class="fas fa-map-marker-alt mr-2"></i> عرض على الخريطة</a></div>`;
+        const faqViewHTML = `<h2 class="text-4xl font-black text-amber-400 mb-8 text-center">الأسئلة الشائعة</h2><div class="space-y-6"><div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><h3 class="text-xl font-bold text-amber-400 mb-2">ما هي طرق الدفع المتاحة؟</h3><p class="text-gray-300">حالياً، نحن نقبل الدفع عبر الطرق التالية:<br><b class="text-amber-400">- بريدي موب (BaridiMob)</b><br><b class="text-amber-400">- حساب جاري بريدي (CCP)</b><br><b class="text-amber-400">- يداً بيد (متوفر لعملائنا في ولاية بسكرة)</b><br><br>نحن لا نتعامل ببطاقات الائتمان (Credit Cards). بعد اختيارك للخدمة وتواصلك معنا عبر واتساب، سنقوم بتزويدك بالمعلومات اللازمة لإتمام عملية الدفع.</p></div><div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><h3 class="text-xl font-bold text-amber-400 mb-2">كيف أجد ID الخاص بحسابي؟</h3><p class="text-gray-300">يمكنك العثور على ID الخاص بك في صفحة ملفك الشخصي داخل اللعبة، عادة ما يكون بجانب صورتك الرمزية. تأكد من نسخه بدقة.</p></div><div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><h3 class="text-xl font-bold text-amber-400 mb-2">كم يستغرق الشحن؟</h3><p class="text-gray-300">تتم معظم عمليات الشحن خلال دقائق قليلة بعد تأكيد الدفع.</p></div><div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><h3 class="text-xl font-bold text-amber-400 mb-2">هل عملية الشحن آمنة؟</h3><p class="text-gray-300">نعم، العملية آمنة 100%. نحن نستخدم الطرق الرسمية فقط للشحن عن طريق ID اللاعب. لا يوجد أي خطر على حسابك.</p></div></div>`;
+        const howToOrderViewHTML = `<h2 class="text-4xl font-black text-amber-400 mb-8 text-center">كيفية الطلب</h2><div class="bg-gray-800 p-8 rounded-lg border border-gray-700 text-center"><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="flex flex-col items-center"><div class="bg-amber-500 text-gray-900 rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-4">1</div><h3 class="text-xl font-bold mb-2">اختر باقتك</h3><p class="text-gray-400">تصفح خدماتنا واختر الباقة التي تناسبك.</p></div><div class="flex flex-col items-center"><div class="bg-amber-500 text-gray-900 rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-4">2</div><h3 class="text-xl font-bold mb-2">تواصل معنا</h3><p class="text-gray-400">اضغط على زر الشراء وسيتم توجيهك إلى واتساب.</p></div><div class="flex flex-col items-center"><div class="bg-amber-500 text-gray-900 rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-4">3</div><h3 class="text-xl font-bold mb-2">استلم شحنك</h3><p class="text-gray-400">بعد تأكيد الدفع، سيتم شحن حسابك فوراً.</p></div></div></div>`;
         const adminModalHTML = `<div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full border-2 border-amber-500"><h3 class="text-2xl font-bold text-amber-400 mb-6 text-center">دخول الأدمن</h3><form id="admin-login-form" class="space-y-6"><div><label for="admin-email" class="block text-sm font-medium text-gray-300 mb-2">البريد الإلكتروني</label><input type="email" id="admin-email" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div><label for="admin-pass" class="block text-sm font-medium text-gray-300 mb-2">كلمة المرور</label><input type="password" id="admin-pass" required class="w-full bg-gray-700 border border-gray-600 rounded-md p-3"></div><div class="flex justify-between items-center pt-4"><button type="button" id="cancel-admin-login" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700">إلغاء</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600">دخول</button></div></form></div>`;
         const purchaseModalHTML = `<div class="bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 max-w-sm w-full text-center border-2 border-amber-500"><h3 class="text-2xl font-bold text-amber-400 mb-2">تأكيد الطلب</h3><p id="modal-item-name" class="text-lg text-white mb-6"></p><p class="text-gray-300 mb-6">سيتم توجيهك إلى واتساب لإتمام الشراء.</p><div class="flex justify-center space-x-4 space-x-reverse"><button id="confirm-purchase-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600">متابعة</button><button id="cancel-purchase-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700">إلغاء</button></div></div>`;
         
         // --- INITIALIZATION ---
         function init() {
             document.getElementById('store-view').innerHTML = customerViewHTML;
+            document.getElementById('faq-view').innerHTML = faqViewHTML;
+            document.getElementById('how-to-order-view').innerHTML = howToOrderViewHTML;
             document.getElementById('admin-modal').innerHTML = adminModalHTML;
             document.getElementById('purchase-modal').innerHTML = purchaseModalHTML;
             setupEventListeners();
@@ -128,22 +153,26 @@
         // --- AUTHENTICATION & UI State ---
         auth.onAuthStateChanged(user => {
             if (user) {
-                // Admin is signed in
-                ui.authContainer.innerHTML = `<button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>`;
+                const adminAuthHTML = `<button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>`;
+                ui.authContainer.innerHTML = adminAuthHTML;
+                ui.mobileAuthContainer.innerHTML = adminAuthHTML;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-                
-                // Hide customer views, show admin panel
-                ui.views.forEach(v => v.classList.remove('active'));
-                ui.adminPanel.classList.add('active');
-                
+                if (document.getElementById('logout-btn').parentNode.id === 'mobile-auth-container') {
+                    document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+                }
+
+                document.body.classList.add('admin-mode');
+                switchView('admin-panel');
                 loadAdminPanel();
             } else {
-                // Admin is signed out
-                ui.authContainer.innerHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
+                const guestAuthHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
+                const mobileGuestAuthHTML = `<button id="mobile-admin-login-btn" class="w-full text-left bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> دخول الأدمن</button>`;
+                ui.authContainer.innerHTML = guestAuthHTML;
+                ui.mobileAuthContainer.innerHTML = mobileGuestAuthHTML;
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
-                
-                // Hide admin panel, show default customer view
-                ui.adminPanel.classList.remove('active');
+                document.getElementById('mobile-admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
+
+                document.body.classList.remove('admin-mode');
                 switchView('store-view');
                 updateUiWithSettings();
             }
@@ -170,7 +199,7 @@
 
         // --- EVENT LISTENERS ---
         function setupEventListeners() {
-            document.querySelectorAll('.nav-link, #logo-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchView(e.currentTarget.dataset.view); }));
+            document.querySelectorAll('.nav-link, #logo-link, .mobile-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchView(e.currentTarget.dataset.view); if(ui.mobileMenu.classList.contains('hidden') === false) { ui.mobileMenu.classList.add('hidden'); } }));
             document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
             document.getElementById('cancel-admin-login').addEventListener('click', () => ui.modals.admin.classList.add('hidden'));
             document.body.addEventListener('submit', e => { if(e.target.id === 'review-form') handleReviewSubmit(e); });
@@ -179,6 +208,7 @@
             document.getElementById('cancel-purchase-btn').addEventListener('click', () => ui.modals.purchase.classList.add('hidden'));
             ui.adminPanel.addEventListener('click', handleAdminPanelClick);
             document.body.addEventListener('input', e => { if(e.target.id === 'search-bar') renderServices(); });
+            ui.hamburgerBtn.addEventListener('click', () => ui.mobileMenu.classList.toggle('hidden'));
         }
 
         // --- All Handler Functions ---
@@ -209,11 +239,7 @@
             if(msgrLink) msgrLink.href = siteSettings.messengerUrl || '#';
             if(locLink) locLink.href = siteSettings.locationUrl || '#';
         }
-        function switchView(viewId) {
-            if (!viewId) viewId = 'store-view';
-            ui.views.forEach(v => v.classList.toggle('active', v.id === viewId));
-            ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId));
-        }
+        function switchView(viewId) { if (!viewId) viewId = 'store-view'; const isAdminMode = document.body.classList.contains('admin-mode'); if (isAdminMode && viewId !== 'admin-panel') return; ui.views.forEach(v => v.classList.toggle('active', v.id === viewId)); ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId)); }
         
         // --- ADMIN PANEL ---
         function loadAdminPanel() {
