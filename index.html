@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر RAWKSN - شحن ألعاب وتطبيقات</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        ::selection { background-color: #f59e0b; color: #111827; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 10px; }
+        .card-glow { box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); transition: all 0.3s ease-in-out; }
+        .card-glow:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
+        .admin-view { display: none; }
+    </style>
+
+    <!-- =============================================================== -->
+    <!-- كود الدردشة المباشرة: الصق الكود الذي تحصل عليه من موقع مثل Tawk.to هنا -->
+    <!-- مثال: -->
+    <!-- <script type="text/javascript"> ... </script> -->
+    <!-- =============================================================== -->
+
+</head>
+<body class="text-white">
+
+    <!-- Header -->
+    <header class="bg-gray-800/50 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="#" id="header-logo-link" class="flex items-center space-x-4 space-x-reverse">
+                    <img id="header-logo" class="h-12 w-auto" src="http://googleusercontent.com/file_content/1" alt="RAWKSN Logo">
+                    <h1 class="text-2xl font-black tracking-wider">RAWKSN</h1>
+                </a>
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <a id="whatsapp-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
+                        <i class="fab fa-whatsapp text-2xl"></i>
+                    </a>
+                    <a id="messenger-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400 transition-colors duration-300">
+                        <i class="fab fa-facebook-messenger text-2xl"></i>
+                    </a>
+                    <button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-amber-600 transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-user-shield mr-2"></i> الأدمن
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- Customer View -->
+        <div id="customer-view">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl md:text-5xl font-black text-amber-400 mb-2">متجر RAWKSN</h2>
+                <p class="text-lg text-gray-300">وجهتك الأولى لشحن الألعاب والتطبيقات بأمان وسرعة</p>
+            </div>
+            <!-- Category Filters -->
+            <div id="category-filters" class="flex justify-center flex-wrap gap-3 mb-10">
+                <!-- سيتم ملء فلاتر الأقسام هنا -->
+            </div>
+            <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- سيتم ملء الخدمات هنا -->
+            </div>
+        </div>
+
+        <!-- Admin View (Hidden by default) -->
+        <div id="admin-view" class="admin-view bg-gray-800 p-4 sm:p-8 rounded-xl shadow-2xl">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                <h2 class="text-3xl font-bold text-amber-400">لوحة تحكم الأدمن</h2>
+                <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i> خروج
+                </button>
+            </div>
+            
+            <!-- General Settings -->
+            <div class="bg-gray-700 p-6 rounded-lg mb-8">
+                <h3 class="text-2xl font-bold mb-4">الإعدادات العامة</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">رابط الشعار (Logo URL)</label>
+                        <input type="text" id="admin-logo-url" class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">رابط واتساب (كامل)</label>
+                        <input type="text" id="admin-whatsapp-url" class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">رابط مسنجر (كامل)</label>
+                        <input type="text" id="admin-messenger-url" class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">طرق الدفع المتاحة (للعرض فقط)</label>
+                        <div class="flex items-center space-x-4 space-x-reverse">
+                            <label class="flex items-center"><input type="checkbox" id="admin-ccp-enabled" class="form-checkbox h-5 w-5 text-amber-500 bg-gray-600 border-gray-500 rounded focus:ring-amber-500"> <span class="mr-2">CCP</span></label>
+                            <label class="flex items-center"><input type="checkbox" id="admin-baridimob-enabled" class="form-checkbox h-5 w-5 text-amber-500 bg-gray-600 border-gray-500 rounded focus:ring-amber-500"> <span class="mr-2">BaridiMob</span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Management -->
+            <div id="admin-services-list" class="space-y-6">
+                <!-- سيتم ملء نماذج تعديل الخدمات هنا -->
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <button id="add-service-btn" class="w-full sm:w-auto bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-lg">
+                    <i class="fas fa-plus-circle mr-2"></i> إضافة خدمة جديدة
+                </button>
+                <button id="save-all-btn" class="w-full sm:w-auto bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors text-lg">
+                    <i class="fas fa-save mr-2"></i> حفظ كل التغييرات
+                </button>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Purchase Modal -->
+    <div id="purchase-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 max-w-sm w-full text-center">
+            <h3 class="text-2xl font-bold text-amber-400 mb-2">تأكيد الطلب</h3>
+            <p id="modal-item-name" class="text-lg text-white mb-4"></p>
+            <div class="mb-6">
+                <p class="text-gray-400 mb-2">طرق الدفع المتاحة:</p>
+                <div id="modal-payment-options" class="flex justify-center items-center gap-4">
+                    <!-- سيتم عرض أيقونات الدفع هنا -->
+                </div>
+            </div>
+            <p class="text-gray-300 mb-6">لإتمام الشراء، يرجى التواصل معنا عبر واتساب.</p>
+            <div class="space-x-4 space-x-reverse">
+                 <button id="confirm-purchase-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600 transition-colors">متابعة إلى واتساب</button>
+                 <button id="cancel-purchase-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- قاعدة البيانات والإعدادات ---
+        // ملاحظة: في تطبيق حقيقي، يجب أن تكون هذه البيانات في قاعدة بيانات على الخادم.
+        let settings = {
+            logoUrl: 'http://googleusercontent.com/file_content/1',
+            whatsappUrl: 'https://wa.me/213000000000', // استبدل بالرقم الصحيح
+            messengerUrl: 'https://m.me/your-page', // استبدل بالرابط الصحيح
+            payment: {
+                ccp: true,
+                baridimob: true,
+            },
+            // هام جداً: هذه ليست طريقة آمنة. إنها فقط لمنع المستخدم العادي.
+            // في مشروع حقيقي، يجب استخدام نظام مصادقة على الخادم.
+            adminPassword: '1234' 
+        };
+
+        let services = [
+            {
+                id: 'pubg',
+                name: 'شحن شدات ببجي موبايل',
+                category: 'ألعاب',
+                image: 'https://placehold.co/600x400/000000/f59e0b?text=PUBG+Mobile',
+                description: 'شحن فوري وآمن لحسابك عن طريق ID اللاعب فقط.',
+                packages: [
+                    { name: '60 UC', price: 750 },
+                    { name: '325 UC', price: 3500 },
+                    { name: '660 UC', price: 6800 },
+                ]
+            },
+            {
+                id: 'tiktok',
+                name: 'شحن عملات تيك توك',
+                category: 'تطبيقات',
+                image: 'https://placehold.co/600x400/000000/f59e0b?text=TikTok',
+                description: 'ادعم صناع المحتوى المفضلين لديك بشحن سريع.',
+                packages: [
+                    { name: '70 Coins', price: 850 },
+                    { name: '350 Coins', price: 4200 },
+                ]
+            }
+        ];
+
+        // --- عناصر الواجهة ---
+        const customerView = document.getElementById('customer-view');
+        const adminView = document.getElementById('admin-view');
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const saveAllBtn = document.getElementById('save-all-btn');
+        const addServiceBtn = document.getElementById('add-service-btn');
+        const servicesGrid = document.getElementById('services-grid');
+        const adminServicesList = document.getElementById('admin-services-list');
+        const categoryFilters = document.getElementById('category-filters');
+        
+        // --- دوال العرض (Rendering) ---
+        function renderAll() {
+            renderCustomerView();
+            renderAdminView();
+            updateGeneralSettingsUI();
+        }
+
+        function renderCustomerView(filter = 'الكل') {
+            servicesGrid.innerHTML = '';
+            const filteredServices = services.filter(s => filter === 'الكل' || s.category === filter);
+
+            if (filteredServices.length === 0) {
+                servicesGrid.innerHTML = `<p class="text-center text-gray-400 col-span-full">لا توجد خدمات في هذا القسم حالياً.</p>`;
+            }
+
+            filteredServices.forEach(service => {
+                const packagesHtml = service.packages.map(pkg => `
+                    <div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg">
+                        <span class="font-semibold">${pkg.name}</span>
+                        <button data-service-id="${service.id}" data-package-name="${pkg.name}" class="buy-btn bg-amber-500 text-gray-900 text-sm font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-transform transform hover:scale-105">
+                            ${pkg.price.toLocaleString()} د.ج
+                        </button>
+                    </div>
+                `).join('');
+
+                servicesGrid.innerHTML += `
+                    <div class="bg-gray-800 rounded-xl overflow-hidden card-glow flex flex-col">
+                        <img src="${service.image}" alt="${service.name}" class="w-full h-48 object-cover">
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-2xl font-bold mb-2">${service.name}</h3>
+                            <p class="text-gray-400 mb-4 flex-grow">${service.description}</p>
+                            <div class="space-y-3">${packagesHtml}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            renderCategoryFilters(filter);
+        }
+
+        function renderCategoryFilters(activeFilter) {
+            const categories = ['الكل', ...new Set(services.map(s => s.category))];
+            categoryFilters.innerHTML = categories.map(cat => `
+                <button class="category-btn ${activeFilter === cat ? 'bg-amber-500 text-gray-900' : 'bg-gray-700 text-gray-300'} font-bold py-2 px-5 rounded-full hover:bg-amber-600 hover:text-gray-900 transition-colors duration-300">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function renderAdminView() {
+            adminServicesList.innerHTML = '';
+            services.forEach((service, serviceIndex) => {
+                const packagesInputsHtml = service.packages.map((pkg, pkgIndex) => `
+                    <div class="flex items-center space-x-2 space-x-reverse mb-2">
+                        <input type="text" value="${pkg.name}" placeholder="اسم الباقة" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md">
+                        <input type="number" value="${pkg.price}" placeholder="السعر" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md">
+                        <button data-service-index="${serviceIndex}" data-package-index="${pkgIndex}" class="remove-pkg-btn text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
+                    </div>
+                `).join('');
+
+                adminServicesList.innerHTML += `
+                    <div class="bg-gray-700 p-4 rounded-lg" data-service-index="${serviceIndex}">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-amber-400">${service.name}</h4>
+                            <button class="remove-service-btn text-red-500 hover:text-red-400 text-lg"><i class="fas fa-trash-alt"></i> حذف الخدمة</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label>اسم الخدمة</label><input type="text" value="${service.name}" class="service-name w-full bg-gray-600 p-2 rounded-md mt-1"></div>
+                            <div><label>القسم</label><input type="text" value="${service.category}" class="service-category w-full bg-gray-600 p-2 rounded-md mt-1"></div>
+                            <div class="md:col-span-2"><label>الوصف</label><textarea class="service-desc w-full bg-gray-600 p-2 rounded-md mt-1 h-20">${service.description}</textarea></div>
+                            <div class="md:col-span-2"><label>رابط الصورة</label><input type="text" value="${service.image}" class="service-image w-full bg-gray-600 p-2 rounded-md mt-1"></div>
+                        </div>
+                        <div class="mt-4">
+                            <h5 class="font-bold mb-2">الباقات</h5>
+                            <div class="packages-list">${packagesInputsHtml}</div>
+                            <button data-service-index="${serviceIndex}" class="add-pkg-btn mt-2 text-green-400 hover:text-green-300"><i class="fas fa-plus-circle mr-2"></i>إضافة باقة</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        function updateGeneralSettingsUI() {
+            // تحديث واجهة المستخدم العامة (الشعار، الروابط، الخ)
+            document.getElementById('header-logo').src = settings.logoUrl;
+            document.getElementById('whatsapp-link').href = settings.whatsappUrl;
+            document.getElementById('messenger-link').href = settings.messengerUrl;
+            
+            // تحديث حقول الإدخال في لوحة الأدمن
+            document.getElementById('admin-logo-url').value = settings.logoUrl;
+            document.getElementById('admin-whatsapp-url').value = settings.whatsappUrl;
+            document.getElementById('admin-messenger-url').value = settings.messengerUrl;
+            document.getElementById('admin-ccp-enabled').checked = settings.payment.ccp;
+            document.getElementById('admin-baridimob-enabled').checked = settings.payment.baridimob;
+        }
+
+        // --- دوال التحكم (Logic) ---
+        function login() {
+            const pass = prompt('الرجاء إدخال كلمة مرور الأدمن:');
+            if (pass === settings.adminPassword) {
+                customerView.style.display = 'none';
+                adminView.style.display = 'block';
+            } else if (pass) {
+                alert('كلمة المرور غير صحيحة!');
+            }
+        }
+
+        function logout() {
+            customerView.style.display = 'block';
+            adminView.style.display = 'none';
+        }
+
+        function saveAllChanges() {
+            // حفظ الإعدادات العامة
+            settings.logoUrl = document.getElementById('admin-logo-url').value;
+            settings.whatsappUrl = document.getElementById('admin-whatsapp-url').value;
+            settings.messengerUrl = document.getElementById('admin-messenger-url').value;
+            settings.payment.ccp = document.getElementById('admin-ccp-enabled').checked;
+            settings.payment.baridimob = document.getElementById('admin-baridimob-enabled').checked;
+            
+            // حفظ الخدمات
+            const newServices = [];
+            document.querySelectorAll('#admin-services-list > div').forEach(serviceDiv => {
+                const serviceIndex = serviceDiv.dataset.serviceIndex;
+                const newService = {
+                    id: services[serviceIndex]?.id || `service_${Date.now()}`,
+                    name: serviceDiv.querySelector('.service-name').value,
+                    category: serviceDiv.querySelector('.service-category').value,
+                    description: serviceDiv.querySelector('.service-desc').value,
+                    image: serviceDiv.querySelector('.service-image').value,
+                    packages: []
+                };
+
+                serviceDiv.querySelectorAll('.packages-list > div').forEach(pkgDiv => {
+                    newService.packages.push({
+                        name: pkgDiv.querySelector('.pkg-name').value,
+                        price: parseFloat(pkgDiv.querySelector('.pkg-price').value) || 0
+                    });
+                });
+                newServices.push(newService);
+            });
+            
+            services = newServices;
+            alert('تم حفظ كل التغييرات بنجاح!');
+            renderAll();
+            logout();
+        }
+
+        function addNewService() {
+            const newServiceTemplate = {
+                id: `new_${Date.now()}`,
+                name: 'خدمة جديدة',
+                category: 'غير مصنف',
+                image: 'https://placehold.co/600x400/333/ccc?text=New+Service',
+                description: 'وصف الخدمة الجديدة.',
+                packages: [{ name: 'باقة أساسية', price: 1000 }]
+            };
+            services.push(newServiceTemplate);
+            renderAdminView();
+        }
+        
+        // --- ربط الأحداث (Event Listeners) ---
+        adminLoginBtn.addEventListener('click', login);
+        logoutBtn.addEventListener('click', logout);
+        saveAllBtn.addEventListener('click', saveAllChanges);
+        addServiceBtn.addEventListener('click', addNewService);
+
+        adminServicesList.addEventListener('click', e => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const serviceDiv = target.closest('[data-service-index]');
+            const serviceIndex = parseInt(serviceDiv.dataset.serviceIndex);
+
+            if (target.classList.contains('remove-service-btn')) {
+                if (confirm(`هل أنت متأكد من حذف خدمة "${services[serviceIndex].name}"؟`)) {
+                    services.splice(serviceIndex, 1);
+                    renderAdminView();
+                }
+            } else if (target.classList.contains('add-pkg-btn')) {
+                services[serviceIndex].packages.push({ name: 'باقة جديدة', price: 0 });
+                renderAdminView();
+            } else if (target.classList.contains('remove-pkg-btn')) {
+                const pkgIndex = parseInt(target.dataset.packageIndex);
+                services[serviceIndex].packages.splice(pkgIndex, 1);
+                renderAdminView();
+            }
+        });
+
+        categoryFilters.addEventListener('click', e => {
+            if (e.target.classList.contains('category-btn')) {
+                renderCustomerView(e.target.textContent.trim());
+            }
+        });
+        
+        servicesGrid.addEventListener('click', e => {
+            const buyBtn = e.target.closest('.buy-btn');
+            if (buyBtn) {
+                const { serviceId, packageName } = buyBtn.dataset;
+                const service = services.find(s => s.id === serviceId);
+                const pkg = service.packages.find(p => p.name === packageName);
+                
+                document.getElementById('modal-item-name').textContent = `${service.name} - ${pkg.name}`;
+                
+                const paymentOptionsDiv = document.getElementById('modal-payment-options');
+                paymentOptionsDiv.innerHTML = '';
+                if(settings.payment.ccp) paymentOptionsDiv.innerHTML += `<img src="https://placehold.co/100x50/ffffff/000000?text=CCP" alt="CCP" class="h-10">`;
+                if(settings.payment.baridimob) paymentOptionsDiv.innerHTML += `<img src="https://placehold.co/100x50/ffffff/000000?text=BaridiMob" alt="BaridiMob" class="h-10">`;
+
+                const purchaseModal = document.getElementById('purchase-modal');
+                purchaseModal.classList.remove('hidden');
+                
+                const whatsappMessage = `أهلاً RAWKSN، أرغب في شراء: ${service.name} - باقة (${pkg.name}) بسعر ${pkg.price.toLocaleString()} د.ج.`;
+                document.getElementById('confirm-purchase-btn').onclick = () => {
+                    window.open(`${settings.whatsappUrl}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+                    purchaseModal.classList.add('hidden');
+                };
+                document.getElementById('cancel-purchase-btn').onclick = () => purchaseModal.classList.add('hidden');
+            }
+        });
+
+        // --- التشغيل الأولي ---
+        renderAll();
+    });
+    </script>
+</body>
+</html>
