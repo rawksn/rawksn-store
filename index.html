@@ -132,13 +132,11 @@
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
                 document.body.classList.add('admin-mode');
                 switchView('admin-panel');
-                ui.adminPanel.classList.add('active'); // FIX: Explicitly show admin panel
                 loadAdminPanel();
             } else {
                 ui.authContainer.innerHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
                 document.body.classList.remove('admin-mode');
-                ui.adminPanel.classList.remove('active'); // FIX: Explicitly hide admin panel on logout
                 switchView('store-view');
                 updateUiWithSettings();
             }
@@ -217,7 +215,7 @@
         }
         function updateAdminSettingsForm() { document.getElementById('whatsapp-url').value = siteSettings.whatsappUrl || ''; document.getElementById('messenger-url').value = siteSettings.messengerUrl || ''; document.getElementById('location-url').value = siteSettings.locationUrl || ''; document.getElementById('admin-logo-preview').src = siteSettings.logoUrl || 'https://placehold.co/200x80/161b22/4b5563?text=No+Logo'; }
         function handleSettingsFormSubmit(e) { e.preventDefault(); const newSettings = { whatsappUrl: document.getElementById('whatsapp-url').value, messengerUrl: document.getElementById('messenger-url').value, locationUrl: document.getElementById('location-url').value }; db.collection('settings').doc('config').set(newSettings, { merge: true }).then(() => alert('تم حفظ الإعدادات!')).catch(err => alert(`خطأ: ${err.message}`)); }
-        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file || !file.type.startsWith('image/')) return; ui.spinner.classList.remove('hidden'); const storageRef = storage.ref(`logos/site_logo_${Date.now()}`); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => db.collection('settings').doc('config').set({ logoUrl: downloadURL }, { merge: true })).then(() => alert('تم رفع الشعار بنجاح!')).catch(err => alert(`فشل الرفع: ${err.message}`)).finally(() => ui.spinner.classList.add('hidden')); }
+        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file || !file.type.startsWith('image/')) return; const user = auth.currentUser; if (!user) { return alert('يجب أن تكون مسجلاً كأدمن لرفع الشعار.'); } ui.spinner.classList.remove('hidden'); const storageRef = storage.ref(`logos/site_logo_${Date.now()}`); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => db.collection('settings').doc('config').set({ logoUrl: downloadURL }, { merge: true })).then(() => alert('تم رفع الشعار بنجاح!')).catch(err => { console.error("Upload Error:", err); alert(`فشل الرفع: ${err.message}`); }).finally(() => ui.spinner.classList.add('hidden')); }
         function renderServiceForm(service = {}) {
             const { id, name='', description='', image='', popular=false, packages=[] } = service;
             const isEditing = !!id;
