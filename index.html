@@ -128,15 +128,22 @@
         // --- AUTHENTICATION & UI State ---
         auth.onAuthStateChanged(user => {
             if (user) {
+                // Admin is signed in
                 ui.authContainer.innerHTML = `<button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>`;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-                document.body.classList.add('admin-mode');
-                switchView('admin-panel');
+                
+                // Hide customer views, show admin panel
+                ui.views.forEach(v => v.classList.remove('active'));
+                ui.adminPanel.classList.add('active');
+                
                 loadAdminPanel();
             } else {
+                // Admin is signed out
                 ui.authContainer.innerHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
-                document.body.classList.remove('admin-mode');
+                
+                // Hide admin panel, show default customer view
+                ui.adminPanel.classList.remove('active');
                 switchView('store-view');
                 updateUiWithSettings();
             }
@@ -151,7 +158,7 @@
         });
         db.collection('services').orderBy('name').onSnapshot(snapshot => {
             allServices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            if(!document.body.classList.contains('admin-mode')) renderServices();
+            if(!auth.currentUser) renderServices();
         }, console.error);
         db.collection('reviews').orderBy('createdAt', 'desc').limit(6).onSnapshot(snapshot => {
             const grid = document.getElementById('reviews-grid');
@@ -202,7 +209,11 @@
             if(msgrLink) msgrLink.href = siteSettings.messengerUrl || '#';
             if(locLink) locLink.href = siteSettings.locationUrl || '#';
         }
-        function switchView(viewId) { if (!viewId) viewId = 'store-view'; const isAdminMode = document.body.classList.contains('admin-mode'); if (isAdminMode && viewId !== 'admin-panel') return; ui.views.forEach(v => v.classList.toggle('active', v.id === viewId)); ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId)); }
+        function switchView(viewId) {
+            if (!viewId) viewId = 'store-view';
+            ui.views.forEach(v => v.classList.toggle('active', v.id === viewId));
+            ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId));
+        }
         
         // --- ADMIN PANEL ---
         function loadAdminPanel() {
