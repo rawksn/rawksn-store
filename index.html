@@ -37,27 +37,28 @@
     <header class="bg-gray-900/70 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-gray-700">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse" data-view="store-view">
-                    <img id="header-logo" class="h-12 w-auto" src="https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN" alt="RAWKSN Logo">
-                </a>
+                <!-- Left Side (in RTL) - Hamburger on Mobile -->
+                <div class="md:hidden">
+                    <button id="hamburger-btn" class="text-gray-300 hover:text-amber-400 focus:outline-none">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
                 
-                <!-- Desktop Navigation -->
+                <!-- Center - Desktop Navigation -->
                 <nav class="hidden md:flex items-center space-x-6 space-x-reverse">
                     <a href="#store" class="nav-link active" data-view="store-view">المتجر</a>
                     <a href="#faq" class="nav-link" data-view="faq-view">الأسئلة الشائعة</a>
                     <a href="#how-to-order" class="nav-link" data-view="how-to-order-view">كيفية الطلب</a>
                 </nav>
 
+                <!-- Right Side (in RTL) - Logo and Auth -->
                 <div class="flex items-center">
                     <div id="auth-container" class="hidden md:flex items-center space-x-4 space-x-reverse">
                         <!-- Desktop Auth buttons -->
                     </div>
-                    <!-- Mobile Menu Button -->
-                    <div class="md:hidden">
-                        <button id="hamburger-btn" class="text-gray-300 hover:text-amber-400 focus:outline-none">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                        </button>
-                    </div>
+                    <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse md:mr-6" data-view="store-view">
+                        <img id="header-logo" class="h-12 w-auto" src="https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN" alt="RAWKSN Logo">
+                    </a>
                 </div>
             </div>
         </div>
@@ -165,7 +166,6 @@
 
                 document.body.classList.add('admin-mode');
                 switchView('admin-panel');
-                loadAdminPanel();
             } else {
                 const guestAuthHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a>`;
                 const adminLoginBtnHTML = `<button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
@@ -247,12 +247,16 @@
         function switchView(viewId) {
             if (!viewId) viewId = 'store-view';
             const isAdminMode = document.body.classList.contains('admin-mode');
+            
+            ui.views.forEach(v => v.classList.remove('active'));
+            ui.adminPanel.classList.remove('active');
+
             if (isAdminMode) {
-                ui.views.forEach(v => v.classList.remove('active'));
                 ui.adminPanel.classList.add('active');
+                loadAdminPanel(); // Load admin panel content when switching to it
             } else {
-                ui.adminPanel.classList.remove('active');
-                ui.views.forEach(v => v.classList.toggle('active', v.id === viewId));
+                const viewToShow = document.getElementById(viewId);
+                if (viewToShow) viewToShow.classList.add('active');
                 ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId));
             }
         }
