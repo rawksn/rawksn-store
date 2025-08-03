@@ -40,20 +40,24 @@
                 <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse" data-view="store-view">
                     <img id="header-logo" class="h-12 w-auto" src="https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN" alt="RAWKSN Logo">
                 </a>
+                
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center space-x-6 space-x-reverse">
                     <a href="#store" class="nav-link active" data-view="store-view">المتجر</a>
                     <a href="#faq" class="nav-link" data-view="faq-view">الأسئلة الشائعة</a>
                     <a href="#how-to-order" class="nav-link" data-view="how-to-order-view">كيفية الطلب</a>
                 </nav>
-                <div id="auth-container" class="hidden md:flex items-center space-x-4 space-x-reverse">
-                    <!-- Desktop Auth buttons will be rendered here by JS -->
-                </div>
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center">
-                    <button id="hamburger-btn" class="text-gray-300 hover:text-amber-400 focus:outline-none">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                    </button>
+
+                <div class="flex items-center">
+                    <div id="auth-container" class="hidden md:flex items-center space-x-4 space-x-reverse">
+                        <!-- Desktop Auth buttons -->
+                    </div>
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden">
+                        <button id="hamburger-btn" class="text-gray-300 hover:text-amber-400 focus:outline-none">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -63,7 +67,7 @@
             <a href="#faq" class="mobile-nav-link block text-gray-300 hover:bg-gray-800 hover:text-amber-400 px-4 py-3" data-view="faq-view">الأسئلة الشائعة</a>
             <a href="#how-to-order" class="mobile-nav-link block text-gray-300 hover:bg-gray-800 hover:text-amber-400 px-4 py-3" data-view="how-to-order-view">كيفية الطلب</a>
             <div id="mobile-auth-container" class="px-4 py-3 border-t border-gray-700">
-                <!-- Mobile Auth buttons will be rendered here by JS -->
+                <!-- Mobile Auth buttons -->
             </div>
         </div>
     </header>
@@ -122,6 +126,7 @@
             mainContent: document.getElementById('main-content'),
             views: document.querySelectorAll('.view'),
             navLinks: document.querySelectorAll('.nav-link'),
+            mobileNavLinks: document.querySelectorAll('.mobile-nav-link'),
             authContainer: document.getElementById('auth-container'),
             mobileAuthContainer: document.getElementById('mobile-auth-container'),
             adminPanel: document.getElementById('admin-panel'),
@@ -156,19 +161,19 @@
                 const adminAuthHTML = `<button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">تسجيل الخروج</button>`;
                 ui.authContainer.innerHTML = adminAuthHTML;
                 ui.mobileAuthContainer.innerHTML = adminAuthHTML;
-                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-                if (document.getElementById('logout-btn').parentNode.id === 'mobile-auth-container') {
-                    document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-                }
+                document.querySelectorAll('#logout-btn').forEach(btn => btn.addEventListener('click', () => auth.signOut()));
 
                 document.body.classList.add('admin-mode');
                 switchView('admin-panel');
                 loadAdminPanel();
             } else {
-                const guestAuthHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
-                const mobileGuestAuthHTML = `<button id="mobile-admin-login-btn" class="w-full text-left bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> دخول الأدمن</button>`;
-                ui.authContainer.innerHTML = guestAuthHTML;
-                ui.mobileAuthContainer.innerHTML = mobileGuestAuthHTML;
+                const guestAuthHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a>`;
+                const adminLoginBtnHTML = `<button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
+                const mobileAdminLoginBtnHTML = `<button id="mobile-admin-login-btn" class="w-full text-left bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> دخول الأدمن</button>`;
+                
+                ui.authContainer.innerHTML = guestAuthHTML + adminLoginBtnHTML;
+                ui.mobileAuthContainer.innerHTML = mobileAdminLoginBtnHTML;
+                
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
                 document.getElementById('mobile-admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
 
@@ -199,7 +204,7 @@
 
         // --- EVENT LISTENERS ---
         function setupEventListeners() {
-            document.querySelectorAll('.nav-link, #logo-link, .mobile-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchView(e.currentTarget.dataset.view); if(ui.mobileMenu.classList.contains('hidden') === false) { ui.mobileMenu.classList.add('hidden'); } }));
+            document.querySelectorAll('.nav-link, #logo-link, .mobile-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchView(e.currentTarget.dataset.view); if(!ui.mobileMenu.classList.contains('hidden')) { ui.mobileMenu.classList.add('hidden'); } }));
             document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
             document.getElementById('cancel-admin-login').addEventListener('click', () => ui.modals.admin.classList.add('hidden'));
             document.body.addEventListener('submit', e => { if(e.target.id === 'review-form') handleReviewSubmit(e); });
@@ -239,7 +244,18 @@
             if(msgrLink) msgrLink.href = siteSettings.messengerUrl || '#';
             if(locLink) locLink.href = siteSettings.locationUrl || '#';
         }
-        function switchView(viewId) { if (!viewId) viewId = 'store-view'; const isAdminMode = document.body.classList.contains('admin-mode'); if (isAdminMode && viewId !== 'admin-panel') return; ui.views.forEach(v => v.classList.toggle('active', v.id === viewId)); ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId)); }
+        function switchView(viewId) {
+            if (!viewId) viewId = 'store-view';
+            const isAdminMode = document.body.classList.contains('admin-mode');
+            if (isAdminMode) {
+                ui.views.forEach(v => v.classList.remove('active'));
+                ui.adminPanel.classList.add('active');
+            } else {
+                ui.adminPanel.classList.remove('active');
+                ui.views.forEach(v => v.classList.toggle('active', v.id === viewId));
+                ui.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId));
+            }
+        }
         
         // --- ADMIN PANEL ---
         function loadAdminPanel() {
