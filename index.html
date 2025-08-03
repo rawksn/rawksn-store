@@ -132,11 +132,13 @@
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
                 document.body.classList.add('admin-mode');
                 switchView('admin-panel');
+                ui.adminPanel.classList.add('active'); // FIX: Explicitly show admin panel
                 loadAdminPanel();
             } else {
                 ui.authContainer.innerHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a><button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
                 document.body.classList.remove('admin-mode');
+                ui.adminPanel.classList.remove('active'); // FIX: Explicitly hide admin panel on logout
                 switchView('store-view');
                 updateUiWithSettings();
             }
