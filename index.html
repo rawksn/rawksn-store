@@ -22,9 +22,11 @@
         ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 10px; }
         .card-glow { background-color: #161b22; border: 1px solid #30363d; box-shadow: 0 0 15px rgba(245, 158, 11, 0.1); transition: all 0.3s ease-in-out; }
         .card-glow:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 0 30px rgba(245, 158, 11, 0.3); border-color: #f59e0b; }
-        .star-rating .fa-star { color: #4b5563; cursor: pointer; transition: color 0.2s; }
-        .star-rating .fa-star.selected, .star-rating:hover .fa-star { color: #f59e0b; }
-        .star-rating:hover .fa-star:hover ~ .fa-star { color: #4b5563; }
+        .star-rating .fa-star { 
+            color: #4b5563; /* gray-600 */
+            cursor: pointer; 
+            transition: color 0.2s; 
+        }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #f59e0b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .upload-overlay { position: absolute; inset: 0; background-color: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; cursor: pointer; }
@@ -37,11 +39,11 @@
     <header class="bg-gray-900/70 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-gray-700">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <!-- Left Side (in RTL) - Hamburger on Mobile -->
-                <div class="md:hidden">
-                    <button id="hamburger-btn" class="text-gray-300 hover:text-amber-400 focus:outline-none">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                    </button>
+                <!-- Right Side (in RTL) - Logo and Hamburger -->
+                <div class="flex items-center">
+                    <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse" data-view="store-view">
+                        <img id="header-logo" class="h-12 w-auto" src="https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN" alt="RAWKSN Logo">
+                    </a>
                 </div>
                 
                 <!-- Center - Desktop Navigation -->
@@ -51,14 +53,16 @@
                     <a href="#how-to-order" class="nav-link" data-view="how-to-order-view">كيفية الطلب</a>
                 </nav>
 
-                <!-- Right Side (in RTL) - Logo and Auth -->
+                <!-- Left Side (in RTL) - Auth and Mobile Menu Button -->
                 <div class="flex items-center">
                     <div id="auth-container" class="hidden md:flex items-center space-x-4 space-x-reverse">
                         <!-- Desktop Auth buttons -->
                     </div>
-                    <a href="#" id="logo-link" class="flex items-center space-x-4 space-x-reverse md:mr-6" data-view="store-view">
-                        <img id="header-logo" class="h-12 w-auto" src="https://placehold.co/200x80/0d1117/f59e0b?text=RAWKSN" alt="RAWKSN Logo">
-                    </a>
+                    <div class="md:hidden ml-4">
+                        <button id="hamburger-btn" class="text-gray-300 hover:text-amber-400 focus:outline-none">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,6 +97,7 @@
     <div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"></div>
     <div id="purchase-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"></div>
     <div id="spinner-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden"><div class="loader"></div></div>
+    <div id="toast-notification" class="toast"></div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -137,6 +142,7 @@
             spinner: document.getElementById('spinner-overlay'),
             hamburgerBtn: document.getElementById('hamburger-btn'),
             mobileMenu: document.getElementById('mobile-menu'),
+            toast: document.getElementById('toast-notification'),
         };
 
         // --- Templates ---
@@ -163,20 +169,16 @@
                 ui.authContainer.innerHTML = adminAuthHTML;
                 ui.mobileAuthContainer.innerHTML = adminAuthHTML;
                 document.querySelectorAll('#logout-btn').forEach(btn => btn.addEventListener('click', () => auth.signOut()));
-
                 document.body.classList.add('admin-mode');
                 switchView('admin-panel');
             } else {
                 const guestAuthHTML = `<a id="whatsapp-header-link" href="#" target="_blank" class="text-gray-300 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></a><a id="messenger-header-link" href="#" target="_blank" class="text-gray-300 hover:text-sky-400"><i class="fab fa-facebook-messenger text-2xl"></i></a>`;
                 const adminLoginBtnHTML = `<button id="admin-login-btn" class="bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> الأدمن</button>`;
                 const mobileAdminLoginBtnHTML = `<button id="mobile-admin-login-btn" class="w-full text-left bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg"><i class="fas fa-user-shield mr-2"></i> دخول الأدمن</button>`;
-                
                 ui.authContainer.innerHTML = guestAuthHTML + adminLoginBtnHTML;
                 ui.mobileAuthContainer.innerHTML = mobileAdminLoginBtnHTML;
-                
                 document.getElementById('admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
                 document.getElementById('mobile-admin-login-btn').addEventListener('click', () => ui.modals.admin.classList.remove('hidden'));
-
                 document.body.classList.remove('admin-mode');
                 switchView('store-view');
                 updateUiWithSettings();
@@ -184,23 +186,9 @@
         });
 
         // --- DATA FETCHING ---
-        db.collection('settings').doc('config').onSnapshot(doc => {
-            if (doc.exists) {
-                siteSettings = doc.data();
-                updateUiWithSettings();
-            }
-        });
-        db.collection('services').orderBy('name').onSnapshot(snapshot => {
-            allServices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            if(!auth.currentUser) renderServices();
-        }, console.error);
-        db.collection('reviews').orderBy('createdAt', 'desc').limit(6).onSnapshot(snapshot => {
-            const grid = document.getElementById('reviews-grid');
-            if(grid) {
-                grid.innerHTML = snapshot.empty ? `<p class="text-center col-span-full">كن أول من يضيف رأيه!</p>` : '';
-                snapshot.forEach(doc => grid.innerHTML += createReviewCard(doc.data()));
-            }
-        }, console.error);
+        db.collection('settings').doc('config').onSnapshot(doc => { if (doc.exists) { siteSettings = doc.data(); updateUiWithSettings(); } });
+        db.collection('services').orderBy('name').onSnapshot(snapshot => { allServices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(!auth.currentUser) renderServices(); }, console.error);
+        db.collection('reviews').orderBy('createdAt', 'desc').limit(6).onSnapshot(snapshot => { const grid = document.getElementById('reviews-grid'); if(grid) { grid.innerHTML = snapshot.empty ? `<p class="text-center col-span-full">كن أول من يضيف رأيه!</p>` : ''; snapshot.forEach(doc => grid.innerHTML += createReviewCard(doc.data())); } }, console.error);
 
         // --- EVENT LISTENERS ---
         function setupEventListeners() {
@@ -218,8 +206,22 @@
 
         // --- All Handler Functions ---
         function handleAdminLogin(e) { e.preventDefault(); auth.signInWithEmailAndPassword(e.target['admin-email'].value, e.target['admin-pass'].value).then(() => ui.modals.admin.classList.add('hidden')).catch(err => alert(`فشل الدخول: ${err.message}`)); }
-        function handleStarRating(e) { if (e.target.matches('.fa-star')) { const val = e.target.dataset.value; document.getElementById('rating-value').value = val; Array.from(e.currentTarget.children).forEach(s => { s.classList.toggle('fas', s.dataset.value <= val); s.classList.toggle('far', s.dataset.value > val); }); } }
-        function handleReviewSubmit(e) { e.preventDefault(); const rating = parseFloat(document.getElementById('rating-value').value); if (rating === 0) return alert('الرجاء اختيار تقييم.'); const review = { name: e.target['reviewer-name'].value, text: e.target['review-text'].value, rating, createdAt: FieldValue.serverTimestamp() }; db.collection('reviews').add(review).then(() => { e.target.reset(); document.getElementById('rating-value').value = '0'; Array.from(document.getElementById('star-rating-input').children).forEach(s => { s.classList.remove('fas'); s.classList.add('far'); }); }).catch(console.error); }
+        function handleStarRating(e) {
+            const star = e.target.closest('.fa-star');
+            if (star) {
+                const ratingContainer = star.parentElement;
+                const value = star.dataset.value;
+                document.getElementById('rating-value').value = value;
+                Array.from(ratingContainer.children).forEach(s => {
+                    const isSelected = parseInt(s.dataset.value) <= parseInt(value);
+                    s.classList.toggle('fas', isSelected);
+                    s.classList.toggle('far', !isSelected);
+                    s.classList.toggle('text-amber-500', isSelected);
+                    s.classList.toggle('text-gray-600', !isSelected);
+                });
+            }
+        }
+        function handleReviewSubmit(e) { e.preventDefault(); const rating = parseFloat(document.getElementById('rating-value').value); if (rating === 0) return alert('الرجاء اختيار تقييم.'); const review = { name: e.target['reviewer-name'].value, text: e.target['review-text'].value, rating, createdAt: FieldValue.serverTimestamp() }; db.collection('reviews').add(review).then(() => { e.target.reset(); document.getElementById('rating-value').value = '0'; Array.from(document.getElementById('star-rating-input').children).forEach(s => { s.classList.remove('fas', 'text-amber-500'); s.classList.add('far', 'text-gray-600'); }); showToast('تم إرسال رأيك للمراجعة!', 'success'); }).catch(console.error); }
         function handlePurchaseClick(e) { const btn = e.target.closest('.buy-btn'); if(btn) { const { serviceName, packageName, packagePrice } = btn.dataset; document.getElementById('modal-item-name').textContent = `${serviceName} - ${packageName} (${packagePrice} د.ج)`; const msg = `أهلاً RAWKSN، أرغب في شراء: ${serviceName} - باقة (${packageName}) بسعر ${packagePrice} د.ج.`; const url = siteSettings.whatsappUrl ? `${siteSettings.whatsappUrl}?text=${encodeURIComponent(msg)}` : '#'; document.getElementById('confirm-purchase-btn').onclick = () => { window.open(url, '_blank'); ui.modals.purchase.classList.add('hidden'); }; ui.modals.purchase.classList.remove('hidden'); } }
         function handleAdminPanelClick(e) { const btn = e.target; const id = btn.dataset.id; if(btn.id === 'add-new-service-form-btn') renderServiceForm(); else if (btn.classList.contains('edit-service-btn')) renderServiceForm(allServices.find(s => s.id === id)); else if (btn.classList.contains('delete-service-btn')) { if(confirm('هل أنت متأكد؟')) db.collection('services').doc(id).delete(); } }
         
@@ -253,7 +255,7 @@
 
             if (isAdminMode) {
                 ui.adminPanel.classList.add('active');
-                loadAdminPanel(); // Load admin panel content when switching to it
+                loadAdminPanel();
             } else {
                 const viewToShow = document.getElementById(viewId);
                 if (viewToShow) viewToShow.classList.add('active');
@@ -271,8 +273,8 @@
             updateAdminSettingsForm();
         }
         function updateAdminSettingsForm() { document.getElementById('whatsapp-url').value = siteSettings.whatsappUrl || ''; document.getElementById('messenger-url').value = siteSettings.messengerUrl || ''; document.getElementById('location-url').value = siteSettings.locationUrl || ''; document.getElementById('admin-logo-preview').src = siteSettings.logoUrl || 'https://placehold.co/200x80/161b22/4b5563?text=No+Logo'; }
-        function handleSettingsFormSubmit(e) { e.preventDefault(); const newSettings = { whatsappUrl: document.getElementById('whatsapp-url').value, messengerUrl: document.getElementById('messenger-url').value, locationUrl: document.getElementById('location-url').value }; db.collection('settings').doc('config').set(newSettings, { merge: true }).then(() => alert('تم حفظ الإعدادات!')).catch(err => alert(`خطأ: ${err.message}`)); }
-        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file || !file.type.startsWith('image/')) return; const user = auth.currentUser; if (!user) { return alert('يجب أن تكون مسجلاً كأدمن لرفع الشعار.'); } ui.spinner.classList.remove('hidden'); const storageRef = storage.ref(`logos/site_logo_${Date.now()}`); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => db.collection('settings').doc('config').set({ logoUrl: downloadURL }, { merge: true })).then(() => alert('تم رفع الشعار بنجاح!')).catch(err => { console.error("Upload Error:", err); alert(`فشل الرفع: ${err.message}`); }).finally(() => ui.spinner.classList.add('hidden')); }
+        function handleSettingsFormSubmit(e) { e.preventDefault(); const newSettings = { whatsappUrl: document.getElementById('whatsapp-url').value, messengerUrl: document.getElementById('messenger-url').value, locationUrl: document.getElementById('location-url').value }; db.collection('settings').doc('config').set(newSettings, { merge: true }).then(() => showToast('تم حفظ الإعدادات!', 'success')).catch(err => showToast(`خطأ: ${err.message}`, 'error')); }
+        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file || !file.type.startsWith('image/')) return; const user = auth.currentUser; if (!user) { return showToast('يجب أن تكون مسجلاً كأدمن لرفع الشعار.', 'error'); } ui.spinner.classList.remove('hidden'); const storageRef = storage.ref(`logos/site_logo_${Date.now()}`); storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => db.collection('settings').doc('config').set({ logoUrl: downloadURL }, { merge: true })).then(() => showToast('تم رفع الشعار بنجاح!', 'success')).catch(err => { console.error("Upload Error:", err); showToast(`فشل الرفع: ${err.message}`, 'error'); }).finally(() => ui.spinner.classList.add('hidden')); }
         function renderServiceForm(service = {}) {
             const { id, name='', description='', image='', popular=false, packages=[] } = service;
             const isEditing = !!id;
@@ -285,9 +287,15 @@
             document.getElementById('packages-list').addEventListener('click', e => { if(e.target.classList.contains('remove-pkg-btn')) e.target.parentElement.remove(); });
         }
         function addPackageField() { const list = document.getElementById('packages-list'); const div = document.createElement('div'); div.className = 'flex items-center space-x-2 space-x-reverse mb-2'; div.innerHTML = `<input type="text" placeholder="اسم الباقة" class="pkg-name w-1/2 bg-gray-500 p-2 rounded-md"><input type="number" placeholder="السعر" class="pkg-price w-1/2 bg-gray-500 p-2 rounded-md"><button type="button" class="remove-pkg-btn text-red-500 p-2">&times;</button>`; list.appendChild(div); }
-        function handleServiceFormSubmit(e) { e.preventDefault(); const form = e.target; const id = form.querySelector('#service-id').value; const packages = []; form.querySelectorAll('#packages-list > div').forEach(div => { const name = div.querySelector('.pkg-name').value; const price = parseFloat(div.querySelector('.pkg-price').value); if(name && !isNaN(price)) packages.push({ name, price }); }); const serviceData = { name: form.querySelector('#service-name').value, description: form.querySelector('#service-desc').value, image: form.querySelector('#service-image').value, popular: form.querySelector('#service-popular').checked, packages: packages }; const promise = id ? db.collection('services').doc(id).update(serviceData) : db.collection('services').add(serviceData); promise.then(() => { document.getElementById('service-form-container').classList.add('hidden'); }).catch(console.error); }
+        function handleServiceFormSubmit(e) { e.preventDefault(); const form = e.target; const id = form.querySelector('#service-id').value; const packages = []; form.querySelectorAll('#packages-list > div').forEach(div => { const name = div.querySelector('.pkg-name').value; const price = parseFloat(div.querySelector('.pkg-price').value); if(name && !isNaN(price)) packages.push({ name, price }); }); const serviceData = { name: form.querySelector('#service-name').value, description: form.querySelector('#service-desc').value, image: form.querySelector('#service-image').value, popular: form.querySelector('#service-popular').checked, packages: packages }; const promise = id ? db.collection('services').doc(id).update(serviceData) : db.collection('services').add(serviceData); promise.then(() => { document.getElementById('service-form-container').classList.add('hidden'); showToast('تم حفظ الخدمة بنجاح!', 'success'); }).catch(console.error); }
         function createServiceCard(service) { return `<div class="card-glow rounded-xl overflow-hidden flex flex-col"><div class="p-6 flex-grow"><div class="flex items-center mb-4"><img src="${service.image || 'https://placehold.co/480x480'}" alt="${service.name}" class="w-16 h-16 object-contain mr-4 ml-2"><div><h3 class="text-2xl font-bold">${service.name}</h3><p class="text-gray-400 text-sm">${service.description}</p></div></div><div class="space-y-3 mt-4">${(service.packages || []).map(pkg => `<div class="flex justify-between items-center bg-gray-700/50 p-3 rounded-lg"><span class="font-semibold">${pkg.name}</span><button data-service-name="${service.name}" data-package-name="${pkg.name}" data-package-price="${pkg.price}" class="buy-btn bg-amber-500 text-gray-900 text-sm font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-transform transform hover:scale-105">${pkg.price.toLocaleString()} د.ج</button></div>`).join('')}</div></div></div>`; }
         function createReviewCard(review) { let starsHtml = ''; for (let i = 1; i <= 5; i++) { starsHtml += `<i class="fas fa-star ${i <= review.rating ? 'text-amber-400' : 'text-gray-600'}"></i>`; } return `<div class="bg-gray-800 p-6 rounded-lg border border-gray-700"><p class="text-gray-300 mb-4">"${review.text}"</p><div class="flex items-center"><div class="flex">${starsHtml}</div><span class="mr-4 font-bold">- ${review.name}</span></div></div>`; }
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
+        }
         
         init();
     });
